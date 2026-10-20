@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, spacing } from '../constants/theme';
+import { spacing } from '../constants/theme';
 import { Button } from './Button';
+import { makeStyles } from '../theme/useTheme';
 
 interface ScreenHeaderProps {
   title: string;
@@ -13,6 +14,7 @@ interface ScreenHeaderProps {
 }
 
 export function ScreenHeader({ title, subtitle, showBack = true, right }: ScreenHeaderProps) {
+  const styles = useStyles();
   const router = useRouter();
   const back = () => {
     if (router.canGoBack()) router.back();
@@ -34,11 +36,13 @@ export function ScreenHeader({ title, subtitle, showBack = true, right }: Screen
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { gap: spacing.xs },
-  row: { flexDirection: 'row', alignItems: 'center', minHeight: 44, gap: spacing.sm },
-  back: { paddingHorizontal: 0 },
-  spacer: { flex: 1 },
-  title: { fontSize: 26, fontWeight: '800', color: colors.text },
-  subtitle: { fontSize: 15, lineHeight: 21, color: colors.textMuted },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    wrap: { gap: spacing.xs },
+    row: { flexDirection: 'row', alignItems: 'center', minHeight: 44, gap: spacing.sm },
+    back: { paddingHorizontal: 0 },
+    spacer: { flex: 1 },
+    title: { fontSize: 26, fontWeight: '800', color: colors.text },
+    subtitle: { fontSize: 15, lineHeight: 21, color: colors.textMuted },
+  }),
+);

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import { usePenneyStore } from '../store/usePenneyStore';
 import { MoodState } from '../types';
 import { Button } from './Button';
 import { PenneyCharacter } from './PenneyCharacter';
+import { makeStyles } from '../theme/useTheme';
 
 interface AppErrorFallbackProps {
   error: Error;
@@ -13,6 +14,7 @@ interface AppErrorFallbackProps {
 
 /** Shown by the root error boundary instead of a blank screen when a render crashes. */
 export function AppErrorFallback({ error, retry }: AppErrorFallbackProps) {
+  const styles = useStyles();
   const [confirmReset, setConfirmReset] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -58,26 +60,28 @@ export function AppErrorFallback({ error, retry }: AppErrorFallbackProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-    gap: spacing.md,
-    width: '100%',
-    maxWidth: 480,
-    alignSelf: 'center',
-  },
-  title: { fontSize: 22, fontWeight: '800', color: colors.text, marginTop: spacing.md },
-  message: { fontSize: 15, lineHeight: 21, color: colors.textMuted, textAlign: 'center' },
-  actions: { alignSelf: 'stretch', gap: spacing.sm, marginTop: spacing.md },
-  details: {
-    alignSelf: 'stretch',
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.md,
-    padding: spacing.md,
-  },
-  detailsText: { fontSize: 12, color: colors.text, fontFamily: 'monospace' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: {
+      flexGrow: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+      gap: spacing.md,
+      width: '100%',
+      maxWidth: 480,
+      alignSelf: 'center',
+    },
+    title: { fontSize: 22, fontWeight: '800', color: colors.text, marginTop: spacing.md },
+    message: { fontSize: 15, lineHeight: 21, color: colors.textMuted, textAlign: 'center' },
+    actions: { alignSelf: 'stretch', gap: spacing.sm, marginTop: spacing.md },
+    details: {
+      alignSelf: 'stretch',
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: radius.md,
+      padding: spacing.md,
+    },
+    detailsText: { fontSize: 12, color: colors.text, fontFamily: 'monospace' },
+  }),
+);

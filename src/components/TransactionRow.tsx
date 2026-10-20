@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CATEGORY_META } from '../constants/categories';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import type { Transaction } from '../types';
 import { formatShortDate } from '../utils/formatDate';
 import { formatCurrency } from '../utils/money';
+import { makeStyles } from '../theme/useTheme';
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -15,6 +16,7 @@ interface TransactionRowProps {
 }
 
 export function TransactionRow({ transaction, onRemove, onPress, showDate = true }: TransactionRowProps) {
+  const styles = useStyles();
   const label = CATEGORY_META[transaction.category].label;
   const amount = formatCurrency(transaction.amount);
   const meta = [showDate ? formatShortDate(transaction.date) : null, transaction.description || null]
@@ -61,33 +63,35 @@ export function TransactionRow({ transaction, onRemove, onPress, showDate = true
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-  },
-  main: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.md,
-    borderRadius: radius.sm,
-  },
-  mainPressed: { backgroundColor: colors.surfaceMuted },
-  text: { flex: 1, gap: 2 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  category: { fontSize: 15, fontWeight: '600', color: colors.text },
-  badge: { borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 1 },
-  badgeEssential: { backgroundColor: '#E3ECF5' },
-  badgeDiscretionary: { backgroundColor: '#F6E7CF' },
-  badgeText: { fontSize: 11, fontWeight: '600', color: colors.text },
-  meta: { fontSize: 13, color: colors.textMuted },
-  amount: { fontSize: 15, fontWeight: '700', color: colors.text },
-  remove: { padding: spacing.xs, borderRadius: radius.sm },
-  removePressed: { backgroundColor: colors.surfaceMuted },
-  removeText: { fontSize: 14, color: colors.textMuted },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    main: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      paddingVertical: spacing.md,
+      borderRadius: radius.sm,
+    },
+    mainPressed: { backgroundColor: colors.surfaceMuted },
+    text: { flex: 1, gap: 2 },
+    titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+    category: { fontSize: 15, fontWeight: '600', color: colors.text },
+    badge: { borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 1 },
+    badgeEssential: { backgroundColor: colors.badgeEssential },
+    badgeDiscretionary: { backgroundColor: colors.badgeDiscretionary },
+    badgeText: { fontSize: 11, fontWeight: '600', color: colors.text },
+    meta: { fontSize: 13, color: colors.textMuted },
+    amount: { fontSize: 15, fontWeight: '700', color: colors.text },
+    remove: { padding: spacing.xs, borderRadius: radius.sm },
+    removePressed: { backgroundColor: colors.surfaceMuted },
+    removeText: { fontSize: 14, color: colors.textMuted },
+  }),
+);

@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { isEssentialCategory } from '../constants/categories';
+import type { AppearancePreference } from '../constants/theme';
 import type { NewTransactionInput, PenneyCommentary, Transaction, UserBudget } from '../types';
 import { toDateKey } from '../utils/dates';
 import { generateId } from '../utils/id';
@@ -10,7 +11,7 @@ import { validateBudget, validateTransactionInput } from '../utils/validation';
 import { sanitizePersistedState, type PersistedPenneyData } from './sanitizePersisted';
 
 const MAX_COMMENTARY_LOG = 60;
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 
 export interface PenneyState {
   budget: UserBudget | null;
@@ -18,6 +19,8 @@ export interface PenneyState {
   transactions: Transaction[];
   /** Daily Penney quotes, newest first. */
   commentaryLog: PenneyCommentary[];
+  /** Light, dark, or follow the device. A device preference, so Reset all data keeps it. */
+  appearance: AppearancePreference;
   /** True once persisted data has loaded from storage. Not persisted. */
   hasHydrated: boolean;
   /** Set when saved data was partly unreadable on load. Not persisted. */
@@ -36,6 +39,7 @@ export interface PenneyActions {
   restoreTransaction: (transaction: Transaction) => void;
   logCommentary: (commentary: PenneyCommentary) => void;
   resetAll: () => void;
+  setAppearance: (appearance: AppearancePreference) => void;
   dismissStorageWarning: () => void;
   setHasHydrated: (value: boolean) => void;
 }
@@ -46,6 +50,7 @@ const initialData: PersistedPenneyData = {
   budget: null,
   transactions: [],
   commentaryLog: [],
+  appearance: 'system',
 };
 
 function sortNewestFirst(transactions: Transaction[]): Transaction[] {
@@ -145,7 +150,11 @@ export const usePenneyStore = create<PenneyStore>()(
       },
 
       resetAll: () => {
-        set({ ...initialData, storageWarning: null });
+        set((state) => ({ ...initialData, appearance: state.appearance, storageWarning: null }));
+      },
+
+      setAppearance: (appearance) => {
+        set({ appearance });
       },
 
       dismissStorageWarning: () => {
@@ -164,8 +173,9 @@ export const usePenneyStore = create<PenneyStore>()(
         budget: state.budget,
         transactions: state.transactions,
         commentaryLog: state.commentaryLog,
+        appearance: state.appearance,
       }),
-      // v1 → v2 added no fields; validation in `merge` covers both shapes.
+      // v2 added no fields; v3 added `appearance`. Validation in `merge` covers every shape.
       migrate: (persisted) => persisted as PersistedPenneyData,
       merge: (persisted, current) => {
         const { data, droppedRecords } = sanitizePersistedState(persisted);

@@ -55,6 +55,18 @@ describe('sanitizePersistedState', () => {
   });
 
   it('handles non-object input', () => {
-    expect(sanitizePersistedState(null).data).toEqual({ budget: null, transactions: [], commentaryLog: [] });
+    expect(sanitizePersistedState(null).data).toEqual({
+      budget: null,
+      transactions: [],
+      commentaryLog: [],
+      appearance: 'system',
+    });
+  });
+
+  it('keeps a valid appearance and defaults anything else to system', () => {
+    expect(sanitizePersistedState({ appearance: 'dark' }).data.appearance).toBe('dark');
+    expect(sanitizePersistedState({ appearance: 'neon' }).data.appearance).toBe('system');
+    expect(sanitizePersistedState({}).data.appearance).toBe('system');
+    expect(sanitizePersistedState({ appearance: 'neon' }).droppedRecords).toBe(0);
   });
 });

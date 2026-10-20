@@ -6,7 +6,7 @@
     "scheme": "penney",
     "description": "A gamified savings companion: a deadpan coin whose mood tracks your discretionary spending.",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#F6F3EC",
     "icon": "./assets/images/icon.png",
     "plugins": [

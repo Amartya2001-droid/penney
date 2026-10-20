@@ -15,7 +15,7 @@ import { TransactionRow } from '../src/components/TransactionRow';
 import { UndoToast } from '../src/components/UndoToast';
 import { CATEGORY_META } from '../src/constants/categories';
 import { MOOD_VISUALS } from '../src/constants/moods';
-import { colors, spacing } from '../src/constants/theme';
+import { spacing } from '../src/constants/theme';
 import { getMonthToDateTransactions } from '../src/engine/calculations';
 import { useDailyCommentary } from '../src/hooks/useDailyCommentary';
 import { usePenneySnapshot } from '../src/hooks/usePenneySnapshot';
@@ -26,6 +26,7 @@ import type { Transaction } from '../src/types';
 import { dateFromKey } from '../src/utils/dates';
 import { formatLongDate } from '../src/utils/formatDate';
 import { formatCurrency } from '../src/utils/money';
+import { makeStyles, useTheme } from '../src/theme/useTheme';
 
 const RECENT_COUNT = 5;
 const FAB_AREA_HEIGHT = 86;
@@ -33,6 +34,8 @@ const FAB_AREA_HEIGHT = 86;
 type ModalState = { mode: 'closed' } | { mode: 'add' } | { mode: 'edit'; transaction: Transaction };
 
 export default function DashboardScreen() {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const todayKey = useTodayKey();
@@ -86,7 +89,7 @@ export default function DashboardScreen() {
 
         <View style={styles.hero}>
           <PenneyCharacter mood={snapshot.mood} />
-          <Text style={[styles.moodLabel, { color: moodVisual.accent }]}>{moodVisual.label}</Text>
+          <Text style={[styles.moodLabel, { color: colors[moodVisual.tone] }]}>{moodVisual.label}</Text>
           <Text style={styles.moodCaption}>{moodVisual.caption}</Text>
         </View>
 
@@ -157,45 +160,47 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.lg,
-    width: '100%',
-    maxWidth: 560,
-    alignSelf: 'center',
-  },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
-  headerText: { flexShrink: 1 },
-  headerActions: { flexDirection: 'row', gap: spacing.sm },
-  appName: { fontSize: 28, fontWeight: '800', color: colors.text },
-  date: { fontSize: 14, color: colors.textMuted },
-  hero: { alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.md },
-  moodLabel: { fontSize: 22, fontWeight: '800', marginTop: spacing.sm },
-  moodCaption: { fontSize: 14, color: colors.textMuted },
-  section: { gap: spacing.xs },
-  sectionHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
-  sectionMeta: { fontSize: 13, color: colors.textMuted },
-  fabWrap: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    pointerEvents: 'box-none',
-  },
-  fab: {
-    width: '100%',
-    maxWidth: 512,
-    minHeight: 54,
-    borderRadius: 27,
-    shadowColor: '#000000',
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-  },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: {
+      paddingHorizontal: spacing.xl,
+      gap: spacing.lg,
+      width: '100%',
+      maxWidth: 560,
+      alignSelf: 'center',
+    },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
+    headerText: { flexShrink: 1 },
+    headerActions: { flexDirection: 'row', gap: spacing.sm },
+    appName: { fontSize: 28, fontWeight: '800', color: colors.text },
+    date: { fontSize: 14, color: colors.textMuted },
+    hero: { alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.md },
+    moodLabel: { fontSize: 22, fontWeight: '800', marginTop: spacing.sm },
+    moodCaption: { fontSize: 14, color: colors.textMuted },
+    section: { gap: spacing.xs },
+    sectionHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+    sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
+    sectionMeta: { fontSize: 13, color: colors.textMuted },
+    fabWrap: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: 'center',
+      paddingHorizontal: spacing.xl,
+      pointerEvents: 'box-none',
+    },
+    fab: {
+      width: '100%',
+      maxWidth: 512,
+      minHeight: 54,
+      borderRadius: 27,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.18,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 6,
+    },
+  }),
+);

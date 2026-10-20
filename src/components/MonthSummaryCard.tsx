@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, type DimensionValue } from 'react-native';
 import { CATEGORY_META } from '../constants/categories';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import type { MonthSummary } from '../utils/monthSummary';
 import { formatCurrency } from '../utils/money';
+import { makeStyles } from '../theme/useTheme';
 
 const MAX_CATEGORIES = 5;
 
@@ -13,6 +14,7 @@ interface MonthSummaryCardProps {
 }
 
 export function MonthSummaryCard({ summary, discretionaryBudget }: MonthSummaryCardProps) {
+  const styles = useStyles();
   const top = summary.byCategory.slice(0, MAX_CATEGORIES);
   const largest = top[0]?.total ?? 0;
 
@@ -63,6 +65,7 @@ interface TotalProps {
 }
 
 function Total({ label, value, sub, strong = false, warn = false }: TotalProps) {
+  const styles = useStyles();
   return (
     <View style={styles.total}>
       <Text style={styles.totalLabel}>{label}</Text>
@@ -78,29 +81,31 @@ function Total({ label, value, sub, strong = false, warn = false }: TotalProps) 
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.lg,
-  },
-  totals: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  total: { flexGrow: 1, flexBasis: 90, gap: 2 },
-  totalLabel: { fontSize: 12, color: colors.textMuted },
-  totalValue: { fontSize: 17, fontWeight: '700', color: colors.text },
-  totalStrong: { fontSize: 20 },
-  totalWarn: { color: colors.danger },
-  totalSub: { fontSize: 12, color: colors.textMuted },
-  categories: { gap: spacing.sm },
-  heading: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase' },
-  catRow: { gap: 4 },
-  catLabelRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  catLabel: { fontSize: 14, color: colors.text },
-  catCount: { color: colors.textMuted },
-  catValue: { fontSize: 14, fontWeight: '600', color: colors.text },
-  track: { height: 6, borderRadius: 3, backgroundColor: colors.surfaceMuted, overflow: 'hidden' },
-  fill: { height: '100%', borderRadius: 3, backgroundColor: colors.primary },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.lg,
+    },
+    totals: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+    total: { flexGrow: 1, flexBasis: 90, gap: 2 },
+    totalLabel: { fontSize: 12, color: colors.textMuted },
+    totalValue: { fontSize: 17, fontWeight: '700', color: colors.text },
+    totalStrong: { fontSize: 20 },
+    totalWarn: { color: colors.danger },
+    totalSub: { fontSize: 12, color: colors.textMuted },
+    categories: { gap: spacing.sm },
+    heading: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase' },
+    catRow: { gap: 4 },
+    catLabelRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    catLabel: { fontSize: 14, color: colors.text },
+    catCount: { color: colors.textMuted },
+    catValue: { fontSize: 14, fontWeight: '600', color: colors.text },
+    track: { height: 6, borderRadius: 3, backgroundColor: colors.surfaceMuted, overflow: 'hidden' },
+    fill: { height: '100%', borderRadius: 3, backgroundColor: colors.primary },
+  }),
+);

@@ -1,5 +1,8 @@
 import { MoodState, PaceStatus } from '../types';
-import { colors } from './theme';
+import type { Tone } from './theme';
+
+/** Penney's facial features. Drawn on the gold coin, so the same in light and dark themes. */
+export const COIN_INK = '#2B2116';
 
 export type EyeStyle = 'happy' | 'open' | 'skeptical' | 'lidded';
 export type MouthStyle = 'smile' | 'flat' | 'smirk' | 'line';
@@ -16,7 +19,8 @@ export interface MoodVisual {
   bobAmplitude: number;
   /** Duration of one half of the bob cycle in ms. */
   bobDurationMs: number;
-  accent: string;
+  /** Colour of the mood label, resolved against the active theme. */
+  tone: Tone;
 }
 
 export const MOOD_VISUALS: Record<MoodState, MoodVisual> = {
@@ -30,7 +34,7 @@ export const MOOD_VISUALS: Record<MoodState, MoodVisual> = {
     mouth: 'smile',
     bobAmplitude: 10,
     bobDurationMs: 700,
-    accent: colors.success,
+    tone: 'success',
   },
   [MoodState.Neutral]: {
     label: 'Neutral',
@@ -42,7 +46,7 @@ export const MOOD_VISUALS: Record<MoodState, MoodVisual> = {
     mouth: 'flat',
     bobAmplitude: 5,
     bobDurationMs: 1200,
-    accent: colors.info,
+    tone: 'info',
   },
   [MoodState.Concerned]: {
     label: 'Concerned',
@@ -54,7 +58,7 @@ export const MOOD_VISUALS: Record<MoodState, MoodVisual> = {
     mouth: 'smirk',
     bobAmplitude: 3,
     bobDurationMs: 1600,
-    accent: colors.warning,
+    tone: 'warning',
   },
   [MoodState.DeadpanDisappointed]: {
     label: 'Deadpan Disappointed',
@@ -66,18 +70,18 @@ export const MOOD_VISUALS: Record<MoodState, MoodVisual> = {
     mouth: 'line',
     bobAmplitude: 0,
     bobDurationMs: 0,
-    accent: colors.danger,
+    tone: 'danger',
   },
 };
 
 export interface PaceVisual {
   label: string;
-  color: string;
+  tone: Tone;
 }
 
 export const PACE_VISUALS: Record<PaceStatus, PaceVisual> = {
-  [PaceStatus.Ahead]: { label: 'Ahead of pace', color: colors.success },
-  [PaceStatus.OnTrack]: { label: 'On track', color: colors.info },
-  [PaceStatus.SlightlyOver]: { label: 'Slightly over', color: colors.warning },
-  [PaceStatus.Over]: { label: 'Over pace', color: colors.danger },
+  [PaceStatus.Ahead]: { label: 'Ahead of pace', tone: 'success' },
+  [PaceStatus.OnTrack]: { label: 'On track', tone: 'info' },
+  [PaceStatus.SlightlyOver]: { label: 'Slightly over', tone: 'warning' },
+  [PaceStatus.Over]: { label: 'Over pace', tone: 'danger' },
 };

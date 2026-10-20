@@ -1,4 +1,6 @@
 import { ALL_CATEGORIES, FIXED_EXPENSE_KEYS } from '../constants/categories';
+import type { AppearancePreference } from '../constants/theme';
+import { isAppearancePreference } from '../theme/resolveScheme';
 import { MoodState, type Category, type PenneyCommentary, type Transaction, type UserBudget } from '../types';
 import { isValidDateKey } from '../utils/dates';
 
@@ -6,6 +8,7 @@ export interface PersistedPenneyData {
   budget: UserBudget | null;
   transactions: Transaction[];
   commentaryLog: PenneyCommentary[];
+  appearance: AppearancePreference;
 }
 
 export interface SanitizeResult {
@@ -84,7 +87,10 @@ function readCommentary(raw: unknown): PenneyCommentary | null {
  */
 export function sanitizePersistedState(raw: unknown): SanitizeResult {
   if (!isObject(raw)) {
-    return { data: { budget: null, transactions: [], commentaryLog: [] }, droppedRecords: 0 };
+    return {
+      data: { budget: null, transactions: [], commentaryLog: [], appearance: 'system' },
+      droppedRecords: 0,
+    };
   }
 
   let droppedRecords = 0;
@@ -111,5 +117,8 @@ export function sanitizePersistedState(raw: unknown): SanitizeResult {
     // Quotes are regenerable, so a bad one is dropped without counting as lost data.
   }
 
-  return { data: { budget, transactions, commentaryLog }, droppedRecords };
+  // A missing or unknown appearance (older saves) quietly falls back to following the device.
+  const appearance = isAppearancePreference(raw.appearance) ? raw.appearance : 'system';
+
+  return { data: { budget, transactions, commentaryLog, appearance }, droppedRecords };
 }

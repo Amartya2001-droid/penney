@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
+import { makeStyles, useTheme } from '../theme/useTheme';
 
 interface NumberFieldProps {
   label: string;
@@ -11,6 +12,8 @@ interface NumberFieldProps {
 }
 
 export function NumberField({ label, value, onChangeText, placeholder, hint, autoFocus }: NumberFieldProps) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   return (
     <View style={styles.wrap}>
       <Text style={styles.label}>{label}</Text>
@@ -34,19 +37,21 @@ export function NumberField({ label, value, onChangeText, placeholder, hint, aut
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { gap: spacing.xs },
-  label: { fontSize: 14, fontWeight: '600', color: colors.text },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md,
-  },
-  prefix: { fontSize: 18, color: colors.textMuted, marginRight: spacing.xs },
-  input: { flex: 1, minHeight: 48, fontSize: 18, color: colors.text },
-  hint: { fontSize: 12, color: colors.textMuted },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    wrap: { gap: spacing.xs },
+    label: { fontSize: 14, fontWeight: '600', color: colors.text },
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.md,
+    },
+    prefix: { fontSize: 18, color: colors.textMuted, marginRight: spacing.xs },
+    input: { flex: 1, minHeight: 48, fontSize: 18, color: colors.text },
+    hint: { fontSize: 12, color: colors.textMuted },
+  }),
+);

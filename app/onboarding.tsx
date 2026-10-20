@@ -6,12 +6,14 @@ import { Button } from '../src/components/Button';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { PenneyCharacter } from '../src/components/PenneyCharacter';
 import { DEMO_ENABLED } from '../src/config/demoConfig';
-import { colors, spacing } from '../src/constants/theme';
+import { spacing } from '../src/constants/theme';
 import { usePenneyStore } from '../src/store/usePenneyStore';
 import { MoodState } from '../src/types';
+import { makeStyles } from '../src/theme/useTheme';
 
 /** First-run setup. Once a budget exists, it's edited from Settings instead. */
 export default function OnboardingScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const hasHydrated = usePenneyStore((s) => s.hasHydrated);
@@ -51,17 +53,19 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.lg,
-    width: '100%',
-    maxWidth: 560,
-    alignSelf: 'center',
-  },
-  hero: { alignItems: 'center', gap: spacing.sm },
-  title: { fontSize: 28, fontWeight: '800', color: colors.text, marginTop: spacing.sm },
-  subtitle: { fontSize: 15, lineHeight: 22, color: colors.textMuted, textAlign: 'center' },
-  privacy: { fontSize: 12, color: colors.textMuted, textAlign: 'center' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: {
+      paddingHorizontal: spacing.xl,
+      gap: spacing.lg,
+      width: '100%',
+      maxWidth: 560,
+      alignSelf: 'center',
+    },
+    hero: { alignItems: 'center', gap: spacing.sm },
+    title: { fontSize: 28, fontWeight: '800', color: colors.text, marginTop: spacing.sm },
+    subtitle: { fontSize: 15, lineHeight: 22, color: colors.textMuted, textAlign: 'center' },
+    privacy: { fontSize: 12, color: colors.textMuted, textAlign: 'center' },
+  }),
+);

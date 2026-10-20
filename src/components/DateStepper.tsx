@@ -1,8 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import type { DateKey } from '../types';
 import { addDays, daysBetween } from '../utils/dates';
 import { formatLongDate } from '../utils/formatDate';
+import { makeStyles } from '../theme/useTheme';
 
 interface DateStepperProps {
   value: DateKey;
@@ -20,6 +21,7 @@ function relativeLabel(value: DateKey, today: DateKey): string | null {
 
 /** A dependency-free date picker that works on iOS, Android, and web: step one day at a time. */
 export function DateStepper({ value, onChange, maxDate }: DateStepperProps) {
+  const styles = useStyles();
   const canGoForward = value < maxDate;
   const relative = relativeLabel(value, maxDate);
 
@@ -48,6 +50,7 @@ interface StepButtonProps {
 }
 
 function StepButton({ label, accessibilityLabel, onPress, disabled = false }: StepButtonProps) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -63,22 +66,24 @@ function StepButton({ label, accessibilityLabel, onPress, disabled = false }: St
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    padding: spacing.xs,
-  },
-  center: { flex: 1, alignItems: 'center' },
-  date: { fontSize: 15, fontWeight: '600', color: colors.text },
-  relative: { fontSize: 12, color: colors.textMuted },
-  step: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
-  pressed: { backgroundColor: colors.surfaceMuted },
-  disabled: { opacity: 0.3 },
-  stepText: { fontSize: 24, color: colors.text, lineHeight: 28 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      padding: spacing.xs,
+    },
+    center: { flex: 1, alignItems: 'center' },
+    date: { fontSize: 15, fontWeight: '600', color: colors.text },
+    relative: { fontSize: 12, color: colors.textMuted },
+    step: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
+    pressed: { backgroundColor: colors.surfaceMuted },
+    disabled: { opacity: 0.3 },
+    stepText: { fontSize: 24, color: colors.text, lineHeight: 28 },
+  }),
+);

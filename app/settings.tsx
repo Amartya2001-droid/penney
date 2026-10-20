@@ -8,15 +8,24 @@ import { Button } from '../src/components/Button';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { NoticeBanner } from '../src/components/NoticeBanner';
 import { ScreenHeader } from '../src/components/ScreenHeader';
+import { SegmentedToggle, type SegmentOption } from '../src/components/SegmentedToggle';
 import { aiConfig } from '../src/config/aiConfig';
 import { DEMO_ENABLED } from '../src/config/demoConfig';
-import { colors, radius, spacing } from '../src/constants/theme';
+import { radius, spacing, type AppearancePreference } from '../src/constants/theme';
 import { usePenneyStore } from '../src/store/usePenneyStore';
 import { buildExport, shareExport } from '../src/utils/exportData';
+import { makeStyles } from '../src/theme/useTheme';
 
 type Notice = { tone: 'success' | 'danger'; message: string } | null;
 
+const APPEARANCE_OPTIONS: readonly SegmentOption<AppearancePreference>[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+];
+
 export default function SettingsScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const hasHydrated = usePenneyStore((s) => s.hasHydrated);
@@ -24,6 +33,8 @@ export default function SettingsScreen() {
   const transactions = usePenneyStore((s) => s.transactions);
   const commentaryLog = usePenneyStore((s) => s.commentaryLog);
   const resetAll = usePenneyStore((s) => s.resetAll);
+  const appearance = usePenneyStore((s) => s.appearance);
+  const setAppearance = usePenneyStore((s) => s.setAppearance);
   const [confirmReset, setConfirmReset] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
@@ -74,6 +85,15 @@ export default function SettingsScreen() {
           description="Changes apply to the whole current month, including days that have already passed."
         >
           <BudgetForm initialBudget={budget} submitLabel="Save budget" />
+        </Section>
+
+        <Section title="Appearance" description="System matches your device's light or dark setting.">
+          <SegmentedToggle
+            options={APPEARANCE_OPTIONS}
+            value={appearance}
+            onChange={setAppearance}
+            accessibilityLabel="Appearance"
+          />
         </Section>
 
         <Section title="Penney's commentary">
@@ -127,6 +147,7 @@ interface SectionProps {
 }
 
 function Section({ title, description, children }: SectionProps) {
+  const styles = useStyles();
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle} accessibilityRole="header">
@@ -138,28 +159,30 @@ function Section({ title, description, children }: SectionProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.xl,
-    width: '100%',
-    maxWidth: 560,
-    alignSelf: 'center',
-  },
-  section: { gap: spacing.md },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
-  sectionDescription: { fontSize: 14, lineHeight: 20, color: colors.textMuted, marginTop: -spacing.sm },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.xs,
-  },
-  cardStrong: { fontSize: 15, fontWeight: '700', color: colors.text },
-  cardText: { fontSize: 14, lineHeight: 20, color: colors.textMuted },
-  warning: { fontSize: 13, color: colors.danger },
-  about: { fontSize: 12, color: colors.textMuted, textAlign: 'center' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: {
+      paddingHorizontal: spacing.xl,
+      gap: spacing.xl,
+      width: '100%',
+      maxWidth: 560,
+      alignSelf: 'center',
+    },
+    section: { gap: spacing.md },
+    sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
+    sectionDescription: { fontSize: 14, lineHeight: 20, color: colors.textMuted, marginTop: -spacing.sm },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.xs,
+    },
+    cardStrong: { fontSize: 15, fontWeight: '700', color: colors.text },
+    cardText: { fontSize: 14, lineHeight: 20, color: colors.textMuted },
+    warning: { fontSize: 13, color: colors.danger },
+    about: { fontSize: 12, color: colors.textMuted, textAlign: 'center' },
+  }),
+);

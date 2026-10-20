@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
+import { makeStyles } from '../theme/useTheme';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
 
@@ -20,6 +21,7 @@ export function Button({
   style,
   accessibilityLabel,
 }: ButtonProps) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -42,21 +44,23 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    minHeight: 44,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primary: { backgroundColor: colors.primary },
-  secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  ghost: { backgroundColor: 'transparent' },
-  pressed: { opacity: 0.75 },
-  disabled: { opacity: 0.45 },
-  label: { fontSize: 16, fontWeight: '600' },
-  labelPrimary: { color: colors.onPrimary },
-  labelOther: { color: colors.text },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    base: {
+      minHeight: 44,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.md,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primary: { backgroundColor: colors.primary },
+    secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    ghost: { backgroundColor: 'transparent' },
+    pressed: { opacity: 0.75 },
+    disabled: { opacity: 0.45 },
+    label: { fontSize: 16, fontWeight: '600' },
+    labelPrimary: { color: colors.onPrimary },
+    labelOther: { color: colors.text },
+  }),
+);

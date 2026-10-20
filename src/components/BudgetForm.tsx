@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import { getFixedExpensesTotal } from '../engine/calculations';
 import { usePenneyStore } from '../store/usePenneyStore';
 import type { UserBudget } from '../types';
@@ -9,6 +9,7 @@ import { formatCurrency } from '../utils/money';
 import { parseAmount } from '../utils/parseAmount';
 import { Button } from './Button';
 import { NumberField } from './NumberField';
+import { makeStyles } from '../theme/useTheme';
 
 type FieldKey = 'income' | 'savings' | 'rent' | 'utilities' | 'insurance' | 'groceries';
 type FieldValues = Record<FieldKey, string>;
@@ -78,6 +79,7 @@ interface BudgetFormProps {
 
 /** Income, savings goal, and fixed essentials, with a live discretionary preview. */
 export function BudgetForm({ initialBudget, submitLabel, onSaved }: BudgetFormProps) {
+  const styles = useStyles();
   const setBudget = usePenneyStore((s) => s.setBudget);
   const [values, setValues] = useState<FieldValues>(() => valuesFromBudget(initialBudget));
   const [savedBudget, setSavedBudget] = useState<UserBudget | null>(initialBudget);
@@ -171,20 +173,22 @@ export function BudgetForm({ initialBudget, submitLabel, onSaved }: BudgetFormPr
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { gap: spacing.lg },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.lg,
-  },
-  preview: { backgroundColor: colors.surfaceMuted, borderRadius: radius.md, padding: spacing.md },
-  previewText: { fontSize: 14, color: colors.text, lineHeight: 20 },
-  previewWarning: { color: colors.danger },
-  error: { color: colors.danger, fontSize: 14 },
-  saved: { color: colors.success, fontSize: 14, fontWeight: '600' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    wrap: { gap: spacing.lg },
+    sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.lg,
+    },
+    preview: { backgroundColor: colors.surfaceMuted, borderRadius: radius.md, padding: spacing.md },
+    previewText: { fontSize: 14, color: colors.text, lineHeight: 20 },
+    previewWarning: { color: colors.danger },
+    error: { color: colors.danger, fontSize: 14 },
+    saved: { color: colors.success, fontSize: 14, fontWeight: '600' },
+  }),
+);

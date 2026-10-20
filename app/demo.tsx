@@ -5,13 +5,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../src/components/Button';
 import { PenneyCharacter } from '../src/components/PenneyCharacter';
 import { MOOD_VISUALS, PACE_VISUALS } from '../src/constants/moods';
-import { colors, radius, spacing } from '../src/constants/theme';
+import { radius, spacing } from '../src/constants/theme';
 import { loadDemoPreset, resetToEmpty } from '../src/demo/loadDemoPreset';
 import { DEMO_PRESETS, previewDemoPreset, type DemoPresetId } from '../src/demo/presets';
 import { usePenneyStore } from '../src/store/usePenneyStore';
 import type { MonthSnapshot } from '../src/types';
 import { dateFromKey, toDateKey } from '../src/utils/dates';
 import { formatCurrency } from '../src/utils/money';
+import { makeStyles, useTheme } from '../src/theme/useTheme';
 
 type PendingAction = DemoPresetId | 'reset' | null;
 
@@ -23,6 +24,8 @@ function describePace(snapshot: MonthSnapshot): string {
 }
 
 export default function DemoScreen() {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const hasData = usePenneyStore((s) => s.budget !== null || s.transactions.length > 0);
@@ -90,7 +93,7 @@ export default function DemoScreen() {
               <PenneyCharacter mood={snapshot.mood} size={64} />
               <View style={styles.cardText}>
                 <Text style={styles.cardTitle}>{preset.title}</Text>
-                <Text style={[styles.mood, { color: mood.accent }]}>{mood.label}</Text>
+                <Text style={[styles.mood, { color: colors[mood.tone] }]}>{mood.label}</Text>
                 <Text style={styles.meta}>{describePace(snapshot)}</Text>
               </View>
             </View>
@@ -124,37 +127,39 @@ export default function DemoScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.lg,
-    width: '100%',
-    maxWidth: 560,
-    alignSelf: 'center',
-  },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontSize: 26, fontWeight: '800', color: colors.text },
-  subtitle: { fontSize: 15, lineHeight: 21, color: colors.textMuted },
-  error: { color: colors.danger, fontSize: 14 },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
-  cardTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  cardText: { flex: 1, gap: 2 },
-  cardTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
-  mood: { fontSize: 14, fontWeight: '700' },
-  tagline: { fontSize: 14, lineHeight: 20, color: colors.text },
-  meta: { fontSize: 13, color: colors.textMuted },
-  resetCard: {
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: {
+      paddingHorizontal: spacing.xl,
+      gap: spacing.lg,
+      width: '100%',
+      maxWidth: 560,
+      alignSelf: 'center',
+    },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontSize: 26, fontWeight: '800', color: colors.text },
+    subtitle: { fontSize: 15, lineHeight: 21, color: colors.textMuted },
+    error: { color: colors.danger, fontSize: 14 },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.lg,
+      gap: spacing.md,
+    },
+    cardTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+    cardText: { flex: 1, gap: 2 },
+    cardTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
+    mood: { fontSize: 14, fontWeight: '700' },
+    tagline: { fontSize: 14, lineHeight: 20, color: colors.text },
+    meta: { fontSize: 13, color: colors.textMuted },
+    resetCard: {
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: radius.lg,
+      padding: spacing.lg,
+      gap: spacing.md,
+    },
+  }),
+);

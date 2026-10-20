@@ -19,6 +19,7 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 - **Daily quote**: one line a day from the AI, with an offline line bank as the fallback
 - **History**: month-by-month summary (totals, top categories), grouped by day, with filters
 - **Demo presets** that show every mood instantly
+- **Light and dark themes**: follows the device by default, or pick Light or Dark in Settings
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
   backup can be exported from Settings
 
@@ -140,7 +141,8 @@ app/                      Screens (expo-router)
 assets/images/            App icon, adaptive icon, splash, favicon
 scripts/generate-icons.py Regenerates the icons in assets/images/
 src/types/                Data model and engine result types
-src/constants/            Categories, thresholds, theme, mood visuals, persona
+src/constants/            Categories, thresholds, theme palettes, mood visuals, persona
+src/theme/                Theme hook and themed styles
 src/engine/               Pace and mood calculations
 src/store/                Zustand store, persistence, load-time validation
 src/hooks/                Snapshot, daily quote, today's date, undo
@@ -151,6 +153,15 @@ src/components/           UI components
 src/utils/                Dates, money, parsing, validation, summaries, export
 src/__tests__/            Jest tests
 ```
+
+## Theming
+
+Both palettes live in `src/constants/theme.ts` and share the same tokens. Components read them
+through `makeStyles` and `useTheme` in `src/theme/useTheme.ts`, so nothing hard-codes a colour.
+Penney's own artwork (the gold coin and his face) is the same in both themes.
+
+`src/__tests__/theme.test.ts` checks WCAG contrast for every text and background pair in both
+palettes (4.5:1 for body text), so a palette change that hurts readability fails the tests.
 
 ## Data and privacy
 
@@ -200,7 +211,7 @@ Build numbers are managed remotely and auto-increment on production builds (`eas
 - [x] AI daily commentary with offline fallback
 - [x] Demo presets
 - [x] Settings, history with edit/delete, empty states, error handling, tests, release config
-- [ ] Dark mode
+- [x] Dark mode
 - [ ] Backup import
 - [ ] Recurring expenses and reminders
 - [ ] Multi-currency (currently CAD)

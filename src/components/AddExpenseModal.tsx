@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CATEGORY_META, DISCRETIONARY_CATEGORIES, ESSENTIAL_CATEGORIES } from '../constants/categories';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import { usePenneyStore } from '../store/usePenneyStore';
 import type { Category, DateKey, Transaction } from '../types';
 import { toDateKey } from '../utils/dates';
@@ -22,6 +22,7 @@ import { Chip } from './Chip';
 import { DateStepper } from './DateStepper';
 import { NumberField } from './NumberField';
 import { SegmentedToggle, type SegmentOption } from './SegmentedToggle';
+import { makeStyles, useTheme } from '../theme/useTheme';
 
 type ExpenseKind = 'discretionary' | 'essential';
 
@@ -50,6 +51,8 @@ interface AddExpenseModalProps {
 }
 
 export function AddExpenseModal({ visible, onClose, editing = null, onDelete }: AddExpenseModalProps) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const addTransaction = usePenneyStore((s) => s.addTransaction);
   const updateTransaction = usePenneyStore((s) => s.updateTransaction);
@@ -212,32 +215,34 @@ export function AddExpenseModal({ visible, onClose, editing = null, onDelete }: 
   );
 }
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { backgroundColor: colors.overlay },
-  sheet: {
-    maxHeight: '90%',
-    backgroundColor: colors.background,
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-  },
-  content: { padding: spacing.xl, gap: spacing.lg, width: '100%', maxWidth: 560, alignSelf: 'center' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontSize: 22, fontWeight: '700', color: colors.text },
-  group: { gap: spacing.sm },
-  label: { fontSize: 14, fontWeight: '600', color: colors.text },
-  hint: { fontSize: 12, color: colors.textMuted },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  textInput: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-    color: colors.text,
-  },
-  error: { color: colors.danger, fontSize: 14 },
-  delete: { marginTop: -spacing.sm },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    flex: { flex: 1, justifyContent: 'flex-end' },
+    backdrop: { backgroundColor: colors.overlay },
+    sheet: {
+      maxHeight: '90%',
+      backgroundColor: colors.background,
+      borderTopLeftRadius: radius.xl,
+      borderTopRightRadius: radius.xl,
+    },
+    content: { padding: spacing.xl, gap: spacing.lg, width: '100%', maxWidth: 560, alignSelf: 'center' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontSize: 22, fontWeight: '700', color: colors.text },
+    group: { gap: spacing.sm },
+    label: { fontSize: 14, fontWeight: '600', color: colors.text },
+    hint: { fontSize: 12, color: colors.textMuted },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+    textInput: {
+      minHeight: 48,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: radius.md,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.md,
+      fontSize: 16,
+      color: colors.text,
+    },
+    error: { color: colors.danger, fontSize: 14 },
+    delete: { marginTop: -spacing.sm },
+  }),
+);

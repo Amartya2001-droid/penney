@@ -12,7 +12,7 @@ import { SegmentedToggle, type SegmentOption } from '../src/components/Segmented
 import { TransactionRow } from '../src/components/TransactionRow';
 import { UndoToast } from '../src/components/UndoToast';
 import { CATEGORY_META } from '../src/constants/categories';
-import { colors, radius, spacing } from '../src/constants/theme';
+import { radius, spacing } from '../src/constants/theme';
 import { getFixedExpensesTotal } from '../src/engine/calculations';
 import { useTodayKey } from '../src/hooks/useTodayKey';
 import { useUndoableDelete } from '../src/hooks/useUndoableDelete';
@@ -22,6 +22,7 @@ import { daysBetween, monthKeyOf } from '../src/utils/dates';
 import { formatLongDate } from '../src/utils/formatDate';
 import { formatMonthLabel, shiftMonthKey, summarizeMonth, type MonthKey } from '../src/utils/monthSummary';
 import { formatCurrency } from '../src/utils/money';
+import { makeStyles } from '../src/theme/useTheme';
 
 type Filter = 'all' | 'discretionary' | 'essential';
 
@@ -41,6 +42,7 @@ function dayHeading(dateKey: string, todayKey: string): string {
 }
 
 export default function TransactionsScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const todayKey = useTodayKey();
   const thisMonth = monthKeyOf(todayKey);
@@ -188,6 +190,7 @@ interface MonthButtonProps {
 }
 
 function MonthButton({ label, accessibilityLabel, disabled, onPress }: MonthButtonProps) {
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -203,37 +206,39 @@ function MonthButton({ label, accessibilityLabel, disabled, onPress }: MonthButt
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: {
-    paddingHorizontal: spacing.xl,
-    width: '100%',
-    maxWidth: 560,
-    alignSelf: 'center',
-  },
-  headerBlock: { gap: spacing.lg, marginBottom: spacing.lg },
-  monthRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xs,
-  },
-  monthLabel: { fontSize: 17, fontWeight: '700', color: colors.text },
-  monthButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
-  monthPressed: { backgroundColor: colors.surfaceMuted },
-  monthDisabled: { opacity: 0.3 },
-  monthArrow: { fontSize: 24, color: colors.text, lineHeight: 28 },
-  dayHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xs,
-  },
-  dayTitle: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase' },
-  dayTotal: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
+    content: {
+      paddingHorizontal: spacing.xl,
+      width: '100%',
+      maxWidth: 560,
+      alignSelf: 'center',
+    },
+    headerBlock: { gap: spacing.lg, marginBottom: spacing.lg },
+    monthRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.xs,
+    },
+    monthLabel: { fontSize: 17, fontWeight: '700', color: colors.text },
+    monthButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
+    monthPressed: { backgroundColor: colors.surfaceMuted },
+    monthDisabled: { opacity: 0.3 },
+    monthArrow: { fontSize: 24, color: colors.text, lineHeight: 28 },
+    dayHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'baseline',
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xs,
+    },
+    dayTitle: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase' },
+    dayTotal: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
+  }),
+);

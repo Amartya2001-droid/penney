@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
+import { makeStyles } from '../theme/useTheme';
 
 export interface SegmentOption<T extends string> {
   value: T;
@@ -19,6 +20,7 @@ export function SegmentedToggle<T extends string>({
   onChange,
   accessibilityLabel,
 }: SegmentedToggleProps<T>) {
+  const styles = useStyles();
   return (
     <View style={styles.track} accessibilityRole="radiogroup" accessibilityLabel={accessibilityLabel}>
       {options.map((option) => {
@@ -39,29 +41,31 @@ export function SegmentedToggle<T extends string>({
   );
 }
 
-const styles = StyleSheet.create({
-  track: {
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceMuted,
-    borderRadius: radius.md,
-    padding: spacing.xs,
-    gap: spacing.xs,
-  },
-  segment: {
-    flex: 1,
-    minHeight: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.sm,
-  },
-  segmentSelected: {
-    backgroundColor: colors.surface,
-    shadowColor: '#000000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 2,
-  },
-  label: { fontSize: 15, fontWeight: '500', color: colors.textMuted },
-  labelSelected: { color: colors.text, fontWeight: '700' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    track: {
+      flexDirection: 'row',
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: radius.md,
+      padding: spacing.xs,
+      gap: spacing.xs,
+    },
+    segment: {
+      flex: 1,
+      minHeight: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: radius.sm,
+    },
+    segmentSelected: {
+      backgroundColor: colors.surfaceRaised,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 1 },
+      elevation: 2,
+    },
+    label: { fontSize: 15, fontWeight: '500', color: colors.textMuted },
+    labelSelected: { color: colors.text, fontWeight: '700' },
+  }),
+);

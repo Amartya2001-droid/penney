@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
-import { MOOD_VISUALS, type EyeStyle, type MouthStyle } from '../constants/moods';
-import { colors } from '../constants/theme';
+import { COIN_INK, MOOD_VISUALS, type EyeStyle, type MouthStyle } from '../constants/moods';
 import type { MoodState } from '../types';
+import { makeStyles } from '../theme/useTheme';
 
 const USE_NATIVE_DRIVER = Platform.OS !== 'web';
 
@@ -12,6 +12,7 @@ interface PenneyCharacterProps {
 }
 
 export function PenneyCharacter({ mood, size = 168 }: PenneyCharacterProps) {
+  const styles = useStyles();
   const visual = MOOD_VISUALS[mood];
   const bob = useRef(new Animated.Value(0)).current;
 
@@ -114,6 +115,7 @@ interface FaceProps {
 }
 
 function Face({ eyes, mouth, size, stroke, faceColor }: FaceProps) {
+  const styles = useStyles();
   const eyeSize = size * 0.13;
   return (
     <View style={[StyleSheet.absoluteFill, styles.face]}>
@@ -149,7 +151,7 @@ function Eye({ variant, size, stroke, faceColor, side }: EyeProps) {
             borderTopWidth: stroke,
             borderLeftWidth: stroke,
             borderRightWidth: stroke,
-            borderColor: colors.ink,
+            borderColor: COIN_INK,
           }}
         />
       </View>
@@ -165,7 +167,7 @@ function Eye({ variant, size, stroke, faceColor, side }: EyeProps) {
           width: size * 1.2,
           height: stroke,
           borderRadius: stroke,
-          backgroundColor: colors.ink,
+          backgroundColor: COIN_INK,
           transform: [{ rotate: side === 'right' ? '-12deg' : '4deg' }],
         }}
       />
@@ -179,7 +181,7 @@ function Eye({ variant, size, stroke, faceColor, side }: EyeProps) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: colors.ink,
+          backgroundColor: COIN_INK,
           overflow: 'hidden',
         }}
       >
@@ -204,7 +206,7 @@ function Eye({ variant, size, stroke, faceColor, side }: EyeProps) {
               height: size * 0.55,
               backgroundColor: faceColor,
               borderBottomWidth: Math.max(2, stroke * 0.8),
-              borderBottomColor: colors.ink,
+              borderBottomColor: COIN_INK,
             }}
           />
         ) : null}
@@ -232,7 +234,7 @@ function Mouth({ variant, size, stroke }: MouthProps) {
           borderBottomWidth: stroke,
           borderLeftWidth: stroke,
           borderRightWidth: stroke,
-          borderColor: colors.ink,
+          borderColor: COIN_INK,
         }}
       />
     );
@@ -245,7 +247,7 @@ function Mouth({ variant, size, stroke }: MouthProps) {
           width: size * 0.2,
           height: stroke,
           borderRadius: stroke,
-          backgroundColor: colors.ink,
+          backgroundColor: COIN_INK,
           transform: [{ translateX: size * 0.04 }, { rotate: '-10deg' }],
         }}
       />
@@ -258,18 +260,20 @@ function Mouth({ variant, size, stroke }: MouthProps) {
         width: variant === 'line' ? size * 0.3 : size * 0.2,
         height: stroke,
         borderRadius: stroke,
-        backgroundColor: colors.ink,
+        backgroundColor: COIN_INK,
       }}
     />
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: { alignItems: 'center' },
-  circle: { alignItems: 'center', justifyContent: 'center' },
-  shine: { position: 'absolute', transform: [{ rotate: '-20deg' }] },
-  face: { alignItems: 'center' },
-  eyesRow: { flexDirection: 'row', alignItems: 'center' },
-  mouthArea: { alignItems: 'center', justifyContent: 'center' },
-  shadow: { backgroundColor: 'rgba(43, 33, 22, 0.15)' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    wrap: { alignItems: 'center' },
+    circle: { alignItems: 'center', justifyContent: 'center' },
+    shine: { position: 'absolute', transform: [{ rotate: '-20deg' }] },
+    face: { alignItems: 'center' },
+    eyesRow: { flexDirection: 'row', alignItems: 'center' },
+    mouthArea: { alignItems: 'center', justifyContent: 'center' },
+    shadow: { backgroundColor: colors.coinShadow },
+  }),
+);

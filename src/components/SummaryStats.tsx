@@ -1,13 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { radius, spacing } from '../constants/theme';
 import type { MonthSnapshot } from '../types';
 import { formatCurrency } from '../utils/money';
+import { makeStyles, useTheme } from '../theme/useTheme';
 
 interface SummaryStatsProps {
   snapshot: MonthSnapshot;
 }
 
 export function SummaryStats({ snapshot }: SummaryStatsProps) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const { target } = snapshot;
   return (
     <View style={styles.row}>
@@ -31,6 +34,7 @@ interface StatTileProps {
 }
 
 function StatTile({ label, value, sub, valueColor }: StatTileProps) {
+  const styles = useStyles();
   return (
     <View style={styles.tile}>
       <Text style={styles.label}>{label}</Text>
@@ -42,20 +46,22 @@ function StatTile({ label, value, sub, valueColor }: StatTileProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  tile: {
-    flexGrow: 1,
-    flexBasis: 100,
-    minWidth: 100,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    gap: 2,
-  },
-  label: { fontSize: 12, color: colors.textMuted },
-  value: { fontSize: 18, fontWeight: '700', color: colors.text },
-  sub: { fontSize: 12, color: colors.textMuted },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+    tile: {
+      flexGrow: 1,
+      flexBasis: 100,
+      minWidth: 100,
+      backgroundColor: colors.surface,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      gap: 2,
+    },
+    label: { fontSize: 12, color: colors.textMuted },
+    value: { fontSize: 18, fontWeight: '700', color: colors.text },
+    sub: { fontSize: 12, color: colors.textMuted },
+  }),
+);
