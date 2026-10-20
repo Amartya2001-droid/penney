@@ -13,6 +13,7 @@ import { PenneyQuoteBox } from '../src/components/PenneyQuoteBox';
 import { SummaryStats } from '../src/components/SummaryStats';
 import { TransactionRow } from '../src/components/TransactionRow';
 import { UndoToast } from '../src/components/UndoToast';
+import { WeekGlance } from '../src/components/WeekGlance';
 import { CATEGORY_META } from '../src/constants/categories';
 import { MOOD_VISUALS } from '../src/constants/moods';
 import { spacing } from '../src/constants/theme';
@@ -26,6 +27,7 @@ import type { Transaction } from '../src/types';
 import { dateFromKey } from '../src/utils/dates';
 import { formatLongDate } from '../src/utils/formatDate';
 import { formatCurrency } from '../src/utils/money';
+import { startOfWeek, summarizeWeek } from '../src/utils/weekSummary';
 import { makeStyles, useTheme } from '../src/theme/useTheme';
 
 const RECENT_COUNT = 5;
@@ -54,6 +56,10 @@ export default function DashboardScreen() {
   const monthTransactions = useMemo(
     () => getMonthToDateTransactions(transactions, refDate),
     [transactions, refDate],
+  );
+  const week = useMemo(
+    () => (budget ? summarizeWeek(transactions, budget, startOfWeek(todayKey), todayKey) : null),
+    [transactions, budget, todayKey],
   );
 
   if (!hasHydrated) return <LoadingScreen />;
@@ -96,6 +102,7 @@ export default function DashboardScreen() {
         <PenneyQuoteBox commentary={commentary} />
         <PaceProgressBar snapshot={snapshot} />
         <SummaryStats snapshot={snapshot} />
+        {week ? <WeekGlance summary={week} onPress={() => router.push('/week')} /> : null}
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>

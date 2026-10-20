@@ -1,18 +1,19 @@
 import { Redirect } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { SectionList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddExpenseModal } from '../src/components/AddExpenseModal';
 import { Button } from '../src/components/Button';
 import { EmptyState } from '../src/components/EmptyState';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { MonthSummaryCard } from '../src/components/MonthSummaryCard';
+import { PeriodSwitcher } from '../src/components/PeriodSwitcher';
 import { ScreenHeader } from '../src/components/ScreenHeader';
 import { SegmentedToggle, type SegmentOption } from '../src/components/SegmentedToggle';
 import { TransactionRow } from '../src/components/TransactionRow';
 import { UndoToast } from '../src/components/UndoToast';
 import { CATEGORY_META } from '../src/constants/categories';
-import { radius, spacing } from '../src/constants/theme';
+import { spacing } from '../src/constants/theme';
 import { getFixedExpensesTotal } from '../src/engine/calculations';
 import { useTodayKey } from '../src/hooks/useTodayKey';
 import { useUndoableDelete } from '../src/hooks/useUndoableDelete';
@@ -93,13 +94,15 @@ export default function TransactionsScreen() {
         right={<Button label="+ Add" variant="secondary" onPress={() => setModal({ mode: 'add' })} />}
       />
 
-      <View style={styles.monthRow}>
-        <MonthButton label="‹" accessibilityLabel="Previous month" disabled={!canGoPrev} onPress={() => setMonthKey(shiftMonthKey(monthKey, -1))} />
-        <Text style={styles.monthLabel} accessibilityLiveRegion="polite">
-          {formatMonthLabel(monthKey)}
-        </Text>
-        <MonthButton label="›" accessibilityLabel="Next month" disabled={!canGoNext} onPress={() => setMonthKey(shiftMonthKey(monthKey, 1))} />
-      </View>
+      <PeriodSwitcher
+        label={formatMonthLabel(monthKey)}
+        previousLabel="Previous month"
+        nextLabel="Next month"
+        canGoPrevious={canGoPrev}
+        canGoNext={canGoNext}
+        onPrevious={() => setMonthKey(shiftMonthKey(monthKey, -1))}
+        onNext={() => setMonthKey(shiftMonthKey(monthKey, 1))}
+      />
 
       {summary.count > 0 ? (
         <>
@@ -182,30 +185,6 @@ export default function TransactionsScreen() {
   );
 }
 
-interface MonthButtonProps {
-  label: string;
-  accessibilityLabel: string;
-  disabled: boolean;
-  onPress: () => void;
-}
-
-function MonthButton({ label, accessibilityLabel, disabled, onPress }: MonthButtonProps) {
-  const styles = useStyles();
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      hitSlop={8}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ disabled }}
-      style={({ pressed }) => [styles.monthButton, pressed && styles.monthPressed, disabled && styles.monthDisabled]}
-    >
-      <Text style={styles.monthArrow}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const useStyles = makeStyles((colors) =>
   StyleSheet.create({
     screen: { flex: 1, backgroundColor: colors.background },
@@ -216,21 +195,6 @@ const useStyles = makeStyles((colors) =>
       alignSelf: 'center',
     },
     headerBlock: { gap: spacing.lg, marginBottom: spacing.lg },
-    monthRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      backgroundColor: colors.surface,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-      padding: spacing.xs,
-    },
-    monthLabel: { fontSize: 17, fontWeight: '700', color: colors.text },
-    monthButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
-    monthPressed: { backgroundColor: colors.surfaceMuted },
-    monthDisabled: { opacity: 0.3 },
-    monthArrow: { fontSize: 24, color: colors.text, lineHeight: 28 },
     dayHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',

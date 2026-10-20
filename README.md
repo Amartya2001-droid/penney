@@ -18,6 +18,8 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
   for the rest of the month without hurting Penney's mood
 - **Daily quote**: one line a day from the AI, with an offline line bank as the fallback
 - **History**: month-by-month summary (totals, top categories), grouped by day, with filters
+- **Weekly summary**: Monday–Sunday spending against daily targets, a day-by-day chart, a
+  like-for-like comparison with last week, no-spend days, and Penney's verdict on the week
 - **Demo presets** that show every mood instantly
 - **Light and dark themes**: follows the device by default, or pick Light or Dark in Settings
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
@@ -80,7 +82,7 @@ Copy `.env.example` to `.env` and set one of the following, then restart with
 | --------------------------------- | ------------------------------------------------------------- |
 | `EXPO_PUBLIC_PENNEY_AI_API_KEY`   | Anthropic API key, read directly by the app (quickest)        |
 | `EXPO_PUBLIC_PENNEY_AI_BASE_URL`  | Your own proxy URL; enables AI without any key in the app     |
-| `EXPO_PUBLIC_PENNEY_AI_MODEL`     | Model ID (default set in `.env.example`)                      |
+| `EXPO_PUBLIC_PENNEY_AI_MODEL`     | Model ID (default in `src/config/aiConfig.ts`)                |
 | `EXPO_PUBLIC_PENNEY_AI_ENABLED`   | `false` forces the offline line bank                          |
 | `PENNEY_AI_*` (same four names)   | Same settings via `app.config.ts` → `extra` (e.g. EAS builds) |
 
@@ -124,6 +126,10 @@ second tap). Hide the demo entry points with `EXPO_PUBLIC_PENNEY_DEMO_ENABLED=fa
 4. Unplanned essentials are spread over the remaining days of the month, starting the day after
    they happen. Days already passed are never re-judged.
 
+The weekly summary uses the same bands, comparing the week's discretionary spending with the sum
+of the engine's daily targets for the days so far. Weeks run Monday to Sunday (`WEEK_STARTS_ON` in
+`src/utils/weekSummary.ts`), and a week in progress is compared with the same days of last week.
+
 Thresholds are in `src/constants/thresholds.ts`. The engine (`src/engine/`) is pure TypeScript
 with no React, and is covered by tests in `src/__tests__/`.
 
@@ -135,6 +141,7 @@ app/                      Screens (expo-router)
   index.tsx               Dashboard: Penney, quote, pace, recent expenses
   onboarding.tsx          First-run budget setup
   transactions.tsx        History: month summary, grouped list, edit/delete
+  week.tsx                Weekly summary: day-by-day chart, comparison, verdict
   settings.tsx            Budget, AI status, backup, demo, reset
   demo.tsx                Demo presets
   +not-found.tsx          Unknown routes
@@ -150,7 +157,7 @@ src/services/penney/      Prompt builder, AI provider, offline fallback
 src/config/               AI and demo settings
 src/demo/                 Demo presets
 src/components/           UI components
-src/utils/                Dates, money, parsing, validation, summaries, export
+src/utils/                Dates, money, parsing, validation, month and week summaries, export
 src/__tests__/            Jest tests
 ```
 
