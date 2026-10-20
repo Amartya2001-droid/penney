@@ -135,6 +135,7 @@ export default function SettingsScreen() {
             disabled={exporting}
             onPress={() => void exportData()}
           />
+          <Button label="Restore from a backup" variant="secondary" onPress={() => router.push('/import')} />
           {DEMO_ENABLED ? (
             <Button label="Load a demo preset" variant="secondary" onPress={() => router.push('/demo')} />
           ) : null}

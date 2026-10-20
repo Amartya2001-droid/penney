@@ -32,7 +32,8 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 - **Demo presets** that show every mood instantly
 - **Light and dark themes**: follows the device by default, or pick Light or Dark in Settings
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
-  backup can be exported from Settings
+  backup can be exported from Settings and restored on any device, either replacing everything
+  or adding only the expenses that aren't there yet
 
 ## Requirements
 
@@ -190,6 +191,7 @@ app/                      Screens (expo-router)
   week.tsx                Weekly summary: day-by-day chart, comparison, verdict
   charts.tsx              Spending charts: month so far, categories, month by month
   settings.tsx            Budget, category limits, appearance, AI status, backup, demo, reset
+  import.tsx              Restore from a backup file or pasted text
   demo.tsx                Demo presets
   +not-found.tsx          Unknown routes
 assets/images/            App icon, adaptive icon, splash, favicon
@@ -202,6 +204,7 @@ src/store/                Zustand stores, persistence, load-time validation
 src/hooks/                Snapshot, daily quote, today's date, undo, reminder sync
 src/services/penney/      Prompt builder, AI provider, offline fallback
 src/services/reminders/   Local notification scheduling (with a web stub)
+src/services/backup/      Backup file picker (with a web version)
 src/config/               AI and demo settings
 src/demo/                 Demo presets
 src/components/           UI components (charts in src/components/charts/)
@@ -225,6 +228,11 @@ palettes (4.5:1 for body text), so a palette change that hurts readability fails
 - Saved data is validated when the app loads. Unreadable records are skipped and the user is
   told, instead of the app crashing.
 - **Settings → Export backup** produces a JSON file (download on web, share sheet on mobile).
+- **Settings → Restore from a backup** (or "Have a backup? Restore it" on the first screen)
+  reads that file, or its text pasted in. It shows what's inside before changing anything, then
+  either replaces your data (after a second tap, with Undo) or adds only the expenses that aren't
+  already here, matched by ID or by the same purchase logged at the same moment. Unreadable
+  records are skipped and counted. Appearance and reminder settings are never overwritten.
 - The only data that leaves the device is the AI commentary prompt described above, and only
   when AI is configured.
 
@@ -267,7 +275,7 @@ Build numbers are managed remotely and auto-increment on production builds (`eas
 - [x] Demo presets
 - [x] Settings, history with edit/delete, empty states, error handling, tests, release config
 - [x] Dark mode
-- [ ] Backup import
+- [x] Backup import
 - [x] Daily logging reminders
 - [ ] Recurring expenses
 - [ ] Multi-currency (currently CAD)

@@ -7,6 +7,7 @@ import type { CategoryBudgets, NewTransactionInput, PenneyCommentary, Transactio
 import { toDateKey } from '../utils/dates';
 import { generateId } from '../utils/id';
 import { roundCurrency } from '../utils/money';
+import type { BackupData } from '../utils/importBackup';
 import { DEFAULT_REMINDER, isReminderSettings, type ReminderSettings } from '../utils/reminders';
 import { validateBudget, validateCategoryBudgets, validateTransactionInput } from '../utils/validation';
 import { sanitizePersistedState, type PersistedPenneyData } from './sanitizePersisted';
@@ -45,6 +46,14 @@ export interface PenneyActions {
   /** Puts a previously removed transaction back exactly as it was (for undo). */
   restoreTransaction: (transaction: Transaction) => void;
   logCommentary: (commentary: PenneyCommentary) => void;
+  /**
+   * Replaces the budget, expenses, quotes, and category limits in one update (restoring a backup,
+   * or undoing that). Appearance and reminders are device settings and are kept. Throws if the
+   * budget or limits are invalid.
+   */
+  replaceAllData: (data: BackupData) => void;
+  /** Adds already-validated expenses (e.g. from a backup), skipping any whose ID is already here. */
+  addTransactions: (transactions: Transaction[]) => number;
   resetAll: () => void;
   setAppearance: (appearance: AppearancePreference) => void;
   /** Updates the reminder settings. Throws if the result isn't a valid time. */
@@ -169,6 +178,30 @@ export const usePenneyStore = create<PenneyStore>()(
             ...state.commentaryLog.filter((c) => c.date_key !== commentary.date_key),
           ].slice(0, MAX_COMMENTARY_LOG),
         }));
+      },
+
+      replaceAllData: (data) => {
+        const errors = [
+          ...(data.budget ? validateBudget(data.budget) : []),
+          ...validateCategoryBudgets(data.categoryBudgets),
+        ];
+        if (errors.length > 0) throw new Error(errors.join(' '));
+
+        set({
+          budget: data.budget,
+          transactions: sortNewestFirst(data.transactions),
+          commentaryLog: data.commentaryLog.slice(0, MAX_COMMENTARY_LOG),
+          categoryBudgets: { ...data.categoryBudgets },
+        });
+      },
+
+      addTransactions: (incoming) => {
+        const ids = new Set(get().transactions.map((t) => t.id));
+        const fresh = incoming.filter((t) => !ids.has(t.id));
+        if (fresh.length > 0) {
+          set((state) => ({ transactions: sortNewestFirst([...fresh, ...state.transactions]) }));
+        }
+        return fresh.length;
       },
 
       resetAll: () => {

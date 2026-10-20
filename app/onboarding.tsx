@@ -44,6 +44,7 @@ export default function OnboardingScreen() {
 
         <BudgetForm initialBudget={null} submitLabel="Let's go" onSaved={() => router.replace('/')} />
 
+        <Button label="Have a backup? Restore it" variant="ghost" onPress={() => router.push('/import')} />
         {DEMO_ENABLED ? (
           <Button label="Just looking? Try a demo preset" variant="ghost" onPress={() => router.push('/demo')} />
         ) : null}
