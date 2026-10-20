@@ -16,7 +16,7 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 - **Pace bar** comparing discretionary spending so far with the target to date
 - **Unplanned essentials** (emergency repairs, going over a fixed budget) lower the daily target
   for the rest of the month without hurting Penney's mood
-- **Daily quote**: one line a day from Claude, with an offline line bank as the fallback
+- **Daily quote**: one line a day from the AI, with an offline line bank as the fallback
 - **History**: month-by-month summary (totals, top categories), grouped by day, with filters
 - **Demo presets** that show every mood instantly
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
@@ -55,7 +55,7 @@ screen, or go to **Settings → Load a demo preset** later.
 
 ## AI commentary
 
-Penney's daily line can be written by Claude through the Anthropic Messages API. Without
+Penney's daily line can be written by an AI model through the Anthropic Messages API. Without
 configuration, or whenever a call fails or times out (8 s), he uses a built-in offline line bank,
 so the app always works.
 
@@ -79,7 +79,7 @@ Copy `.env.example` to `.env` and set one of the following, then restart with
 | --------------------------------- | ------------------------------------------------------------- |
 | `EXPO_PUBLIC_PENNEY_AI_API_KEY`   | Anthropic API key, read directly by the app (quickest)        |
 | `EXPO_PUBLIC_PENNEY_AI_BASE_URL`  | Your own proxy URL; enables AI without any key in the app     |
-| `EXPO_PUBLIC_PENNEY_AI_MODEL`     | Model ID (default `claude-haiku-5-5`)                         |
+| `EXPO_PUBLIC_PENNEY_AI_MODEL`     | Model ID (default set in `.env.example`)                      |
 | `EXPO_PUBLIC_PENNEY_AI_ENABLED`   | `false` forces the offline line bank                          |
 | `PENNEY_AI_*` (same four names)   | Same settings via `app.config.ts` → `extra` (e.g. EAS builds) |
 
