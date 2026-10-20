@@ -1,9 +1,10 @@
 import { usePenneyStore } from '../store/usePenneyStore';
 import { validateBudget, validateTransactionInput } from '../utils/validation';
-import { buildDemoPreset, type DemoPresetId } from './presets';
+import { DEMO_CATEGORY_BUDGETS, buildDemoPreset, type DemoPresetId } from './presets';
 
 /**
- * Replaces the budget and all transactions with a demo preset, in one persisted update.
+ * Replaces the budget, category limits, and all transactions with a demo preset, in one
+ * persisted update.
  * Today's quote is cleared too, so Penney writes a fresh line for the preset's situation.
  * Throws if the generated data fails the same validation the store uses.
  */
@@ -20,6 +21,7 @@ export function loadDemoPreset(id: DemoPresetId, refDate: Date = new Date()): vo
 
   usePenneyStore.setState({
     budget: data.budget,
+    categoryBudgets: { ...DEMO_CATEGORY_BUDGETS },
     transactions: data.transactions,
     commentaryLog: [],
   });

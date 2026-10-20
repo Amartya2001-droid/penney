@@ -60,6 +60,7 @@ describe('sanitizePersistedState', () => {
       transactions: [],
       commentaryLog: [],
       appearance: 'system',
+      categoryBudgets: {},
     });
   });
 

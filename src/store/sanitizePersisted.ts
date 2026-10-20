@@ -1,7 +1,14 @@
-import { ALL_CATEGORIES, FIXED_EXPENSE_KEYS } from '../constants/categories';
+import { ALL_CATEGORIES, DISCRETIONARY_CATEGORIES, FIXED_EXPENSE_KEYS } from '../constants/categories';
 import type { AppearancePreference } from '../constants/theme';
 import { isAppearancePreference } from '../theme/resolveScheme';
-import { MoodState, type Category, type PenneyCommentary, type Transaction, type UserBudget } from '../types';
+import {
+  MoodState,
+  type Category,
+  type CategoryBudgets,
+  type PenneyCommentary,
+  type Transaction,
+  type UserBudget,
+} from '../types';
 import { isValidDateKey } from '../utils/dates';
 
 export interface PersistedPenneyData {
@@ -9,6 +16,7 @@ export interface PersistedPenneyData {
   transactions: Transaction[];
   commentaryLog: PenneyCommentary[];
   appearance: AppearancePreference;
+  categoryBudgets: CategoryBudgets;
 }
 
 export interface SanitizeResult {
@@ -88,7 +96,7 @@ function readCommentary(raw: unknown): PenneyCommentary | null {
 export function sanitizePersistedState(raw: unknown): SanitizeResult {
   if (!isObject(raw)) {
     return {
-      data: { budget: null, transactions: [], commentaryLog: [], appearance: 'system' },
+      data: { budget: null, transactions: [], commentaryLog: [], appearance: 'system', categoryBudgets: {} },
       droppedRecords: 0,
     };
   }
@@ -120,5 +128,17 @@ export function sanitizePersistedState(raw: unknown): SanitizeResult {
   // A missing or unknown appearance (older saves) quietly falls back to following the device.
   const appearance = isAppearancePreference(raw.appearance) ? raw.appearance : 'system';
 
-  return { data: { budget, transactions, commentaryLog, appearance }, droppedRecords };
+  // Older saves have no limits. Unusable entries are skipped and counted, like other records.
+  const categoryBudgets: CategoryBudgets = {};
+  if (isObject(raw.categoryBudgets)) {
+    for (const [key, value] of Object.entries(raw.categoryBudgets)) {
+      if (DISCRETIONARY_CATEGORIES.includes(key as Category) && isNonNegative(value)) {
+        categoryBudgets[key as Category] = value;
+      } else {
+        droppedRecords++;
+      }
+    }
+  }
+
+  return { data: { budget, transactions, commentaryLog, appearance, categoryBudgets }, droppedRecords };
 }

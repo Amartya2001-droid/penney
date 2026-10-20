@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } fr
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BudgetForm } from '../src/components/BudgetForm';
 import { Button } from '../src/components/Button';
+import { CategoryBudgetForm } from '../src/components/CategoryBudgetForm';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { NoticeBanner } from '../src/components/NoticeBanner';
 import { ScreenHeader } from '../src/components/ScreenHeader';
@@ -12,6 +13,7 @@ import { SegmentedToggle, type SegmentOption } from '../src/components/Segmented
 import { aiConfig } from '../src/config/aiConfig';
 import { DEMO_ENABLED } from '../src/config/demoConfig';
 import { radius, spacing, type AppearancePreference } from '../src/constants/theme';
+import { useTodayKey } from '../src/hooks/useTodayKey';
 import { usePenneyStore } from '../src/store/usePenneyStore';
 import { buildExport, shareExport } from '../src/utils/exportData';
 import { makeStyles } from '../src/theme/useTheme';
@@ -28,10 +30,12 @@ export default function SettingsScreen() {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const todayKey = useTodayKey();
   const hasHydrated = usePenneyStore((s) => s.hasHydrated);
   const budget = usePenneyStore((s) => s.budget);
   const transactions = usePenneyStore((s) => s.transactions);
   const commentaryLog = usePenneyStore((s) => s.commentaryLog);
+  const categoryBudgets = usePenneyStore((s) => s.categoryBudgets);
   const resetAll = usePenneyStore((s) => s.resetAll);
   const appearance = usePenneyStore((s) => s.appearance);
   const setAppearance = usePenneyStore((s) => s.setAppearance);
@@ -48,7 +52,7 @@ export default function SettingsScreen() {
     setNotice(null);
     setExporting(true);
     try {
-      const shared = await shareExport(buildExport(budget, transactions, commentaryLog));
+      const shared = await shareExport(buildExport(budget, transactions, commentaryLog, categoryBudgets));
       if (shared) setNotice({ tone: 'success', message: 'Backup created.' });
     } catch (e) {
       setNotice({
@@ -85,6 +89,13 @@ export default function SettingsScreen() {
           description="Changes apply to the whole current month, including days that have already passed."
         >
           <BudgetForm initialBudget={budget} submitLabel="Save budget" />
+        </Section>
+
+        <Section
+          title="Category limits"
+          description="Optional monthly caps for discretionary categories. Leave a field blank for no limit. They're for planning; Penney's mood still follows your overall budget."
+        >
+          <CategoryBudgetForm todayKey={todayKey} />
         </Section>
 
         <Section title="Appearance" description="System matches your device's light or dark setting.">
@@ -129,7 +140,7 @@ export default function SettingsScreen() {
           />
           {confirmReset ? (
             <Text style={styles.warning}>
-              This deletes your budget, every expense, and Penney’s quotes. It can’t be undone.
+              This deletes your budget, category limits, every expense, and Penney’s quotes. It can’t be undone.
             </Text>
           ) : null}
         </Section>

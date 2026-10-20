@@ -1,5 +1,5 @@
-import { FIXED_EXPENSE_KEYS, ALL_CATEGORIES } from '../constants/categories';
-import type { NewTransactionInput, UserBudget } from '../types';
+import { ALL_CATEGORIES, CATEGORY_META, FIXED_EXPENSE_KEYS } from '../constants/categories';
+import { CategoryKind, type Category, type CategoryBudgets, type NewTransactionInput, type UserBudget } from '../types';
 import { isValidDateKey } from './dates';
 
 const MAX_DESCRIPTION_LENGTH = 120;
@@ -48,5 +48,21 @@ export function validateTransactionInput(input: NewTransactionInput): string[] {
     errors.push(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or fewer.`);
   }
 
+  return errors;
+}
+
+export function validateCategoryBudgets(budgets: CategoryBudgets): string[] {
+  const errors: string[] = [];
+  for (const [key, value] of Object.entries(budgets)) {
+    if (value === undefined) continue;
+    const meta = CATEGORY_META[key as Category];
+    if (!meta) {
+      errors.push(`Unknown category: "${key}".`);
+    } else if (meta.kind !== CategoryKind.Discretionary) {
+      errors.push(`${meta.label} is an essential; limits are only for discretionary categories.`);
+    } else if (!isFiniteNumber(value) || value < 0) {
+      errors.push(`The ${meta.label.toLowerCase()} limit must be 0 or more.`);
+    }
+  }
   return errors;
 }

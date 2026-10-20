@@ -15,7 +15,9 @@ import { CATEGORY_META, DISCRETIONARY_CATEGORIES, ESSENTIAL_CATEGORIES } from '.
 import { radius, spacing } from '../constants/theme';
 import { usePenneyStore } from '../store/usePenneyStore';
 import type { Category, DateKey, Transaction } from '../types';
-import { toDateKey } from '../utils/dates';
+import { categoryImpact } from '../utils/categoryBudgets';
+import { monthKeyOf, toDateKey } from '../utils/dates';
+import { formatCurrency } from '../utils/money';
 import { parseAmount } from '../utils/parseAmount';
 import { Button } from './Button';
 import { Chip } from './Chip';
@@ -56,6 +58,8 @@ export function AddExpenseModal({ visible, onClose, editing = null, onDelete }: 
   const insets = useSafeAreaInsets();
   const addTransaction = usePenneyStore((s) => s.addTransaction);
   const updateTransaction = usePenneyStore((s) => s.updateTransaction);
+  const transactions = usePenneyStore((s) => s.transactions);
+  const categoryBudgets = usePenneyStore((s) => s.categoryBudgets);
 
   const [amountText, setAmountText] = useState('');
   const [kind, setKind] = useState<ExpenseKind>('discretionary');
@@ -87,6 +91,24 @@ export function AddExpenseModal({ visible, onClose, editing = null, onDelete }: 
   const categoryOptions = CATEGORIES_BY_KIND[kind].includes(category)
     ? CATEGORIES_BY_KIND[kind]
     : [category, ...CATEGORIES_BY_KIND[kind]];
+
+  const limitHint = (() => {
+    const amount = parseAmount(amountText);
+    const impact = categoryImpact(transactions, categoryBudgets, category, date, amount ?? 0, editing?.id);
+    if (!impact) return null;
+    const name = CATEGORY_META[category].label.toLowerCase();
+    const period = monthKeyOf(date) === monthKeyOf(todayKey) ? 'this month' : 'that month';
+    const limit = formatCurrency(impact.limit);
+    if (amount === null) {
+      const left = impact.limit - impact.spentBefore;
+      return left >= 0
+        ? { over: false, text: `${formatCurrency(left)} left of your ${limit} ${name} limit ${period}.` }
+        : { over: true, text: `Already ${formatCurrency(-left)} over your ${limit} ${name} limit ${period}.` };
+    }
+    return impact.remainingAfter >= 0
+      ? { over: false, text: `After this, ${formatCurrency(impact.remainingAfter)} left of your ${limit} ${name} limit ${period}.` }
+      : { over: true, text: `This puts ${name} ${formatCurrency(-impact.remainingAfter)} over its ${limit} limit ${period}.` };
+  })();
 
   const changeKind = (next: ExpenseKind) => {
     setKind(next);
@@ -170,6 +192,9 @@ export function AddExpenseModal({ visible, onClose, editing = null, onDelete }: 
                   />
                 ))}
               </View>
+              {limitHint ? (
+                <Text style={[styles.hint, limitHint.over && styles.hintOver]}>{limitHint.text}</Text>
+              ) : null}
             </View>
 
             <View style={styles.group}>
@@ -231,6 +256,7 @@ const useStyles = makeStyles((colors) =>
     group: { gap: spacing.sm },
     label: { fontSize: 14, fontWeight: '600', color: colors.text },
     hint: { fontSize: 12, color: colors.textMuted },
+    hintOver: { color: colors.warning, fontWeight: '600' },
     chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
     textInput: {
       minHeight: 48,

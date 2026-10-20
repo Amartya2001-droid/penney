@@ -23,6 +23,8 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 - **Savings streaks**: days in a row with discretionary spending within that day's target, plus
   the best streak, a no-spend streak, the last two weeks at a glance, and milestones at 3, 7, 14,
   30, 60, and 100 days
+- **Category limits**: optional monthly caps for takeout, Amazon, shopping, and entertainment,
+  with progress bars on the dashboard and a heads-up in the expense form before you go over
 - **Demo presets** that show every mood instantly
 - **Light and dark themes**: follows the device by default, or pick Light or Dark in Settings
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
@@ -140,6 +142,12 @@ it's over; going over today's target ends the streak straight away. Counting sta
 logged expense, so days before someone started using Penney aren't free wins. See
 `src/utils/streaks.ts`.
 
+**Category limits** are a planning aid and never change Penney's mood, which always follows the
+overall discretionary budget. Each limit counts everything logged in that category this month, and
+is marked "spending faster than the month" once spending passes the limit's share for the days so
+far (e.g. 20/31 of it on the 20th), "nearly used up" at 85%, and "over" past 100%. See
+`src/utils/categoryBudgets.ts`.
+
 Thresholds are in `src/constants/thresholds.ts`. The engine (`src/engine/`) is pure TypeScript
 with no React, and is covered by tests in `src/__tests__/`.
 
@@ -148,11 +156,11 @@ with no React, and is covered by tests in `src/__tests__/`.
 ```
 app/                      Screens (expo-router)
   _layout.tsx             Root stack and crash screen
-  index.tsx               Dashboard: Penney, quote, pace, recent expenses
+  index.tsx               Dashboard: Penney, quote, pace, week, streak, limits, expenses
   onboarding.tsx          First-run budget setup
   transactions.tsx        History: month summary, grouped list, edit/delete
   week.tsx                Weekly summary: day-by-day chart, comparison, verdict
-  settings.tsx            Budget, AI status, backup, demo, reset
+  settings.tsx            Budget, category limits, appearance, AI status, backup, demo, reset
   demo.tsx                Demo presets
   +not-found.tsx          Unknown routes
 assets/images/            App icon, adaptive icon, splash, favicon
@@ -167,7 +175,7 @@ src/services/penney/      Prompt builder, AI provider, offline fallback
 src/config/               AI and demo settings
 src/demo/                 Demo presets
 src/components/           UI components
-src/utils/                Dates, money, parsing, validation, month/week summaries, streaks, export
+src/utils/                Dates, money, parsing, validation, summaries, streaks, limits, export
 src/__tests__/            Jest tests
 ```
 
@@ -182,7 +190,7 @@ palettes (4.5:1 for body text), so a palette change that hurts readability fails
 
 ## Data and privacy
 
-- Budget, expenses, and quotes are stored locally with AsyncStorage (browser storage on web).
+- Budget, category limits, expenses, and quotes are stored locally with AsyncStorage (browser storage on web).
   There's no account and no server.
 - Saved data is validated when the app loads. Unreadable records are skipped and the user is
   told, instead of the app crashing.

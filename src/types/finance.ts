@@ -32,6 +32,12 @@ export interface UserBudget {
   fixed_expenses: FixedExpenses;
 }
 
+/**
+ * Optional monthly limits for discretionary categories. A missing key means no limit.
+ * Limits are a planning aid only; Penney's mood still follows the overall discretionary budget.
+ */
+export type CategoryBudgets = Partial<Record<Category, number>>;
+
 export interface Transaction {
   id: string;
   /** Positive amount in major currency units (e.g. 12.5 = $12.50). */

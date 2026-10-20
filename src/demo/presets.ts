@@ -1,6 +1,14 @@
 import { calculateDailyTargetPace } from '../engine/calculations';
 import { getMonthSnapshot } from '../engine/snapshot';
-import { Category, MoodState, type DateKey, type MonthSnapshot, type Transaction, type UserBudget } from '../types';
+import {
+  Category,
+  MoodState,
+  type CategoryBudgets,
+  type DateKey,
+  type MonthSnapshot,
+  type Transaction,
+  type UserBudget,
+} from '../types';
 import { addDays, dateFromKey, parseDateKey, toDateKey } from '../utils/dates';
 import { generateId } from '../utils/id';
 import { roundCurrency } from '../utils/money';
@@ -63,6 +71,17 @@ export const DEMO_BUDGET: UserBudget = {
   monthly_income: 4200,
   savings_goal: 800,
   fixed_expenses: { rent: 1500, utilities: 180, insurance: 120, groceries: 450 },
+};
+
+/**
+ * Example category limits loaded with every preset, so the category limits card has something to
+ * show. They add up to the demo's $1,150 discretionary budget and lean the way the demo spending does.
+ */
+export const DEMO_CATEGORY_BUDGETS: CategoryBudgets = {
+  [Category.Takeout]: 150,
+  [Category.Amazon]: 250,
+  [Category.Shopping]: 450,
+  [Category.Entertainment]: 300,
 };
 
 /** Planned essentials, all within their fixed budgets, so none of them moves the target pace. */

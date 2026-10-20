@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { Platform, Share } from 'react-native';
-import type { PenneyCommentary, Transaction, UserBudget } from '../types';
+import type { CategoryBudgets, PenneyCommentary, Transaction, UserBudget } from '../types';
 import { toDateKey } from './dates';
 
 export interface PenneyExport {
@@ -8,6 +8,7 @@ export interface PenneyExport {
   appVersion: string;
   exportedAt: string;
   budget: UserBudget | null;
+  categoryBudgets: CategoryBudgets;
   transactions: Transaction[];
   commentaryLog: PenneyCommentary[];
 }
@@ -16,12 +17,14 @@ export function buildExport(
   budget: UserBudget | null,
   transactions: Transaction[],
   commentaryLog: PenneyCommentary[],
+  categoryBudgets: CategoryBudgets = {},
 ): PenneyExport {
   return {
     app: 'penney',
     appVersion: Constants.expoConfig?.version ?? 'unknown',
     exportedAt: new Date().toISOString(),
     budget,
+    categoryBudgets,
     transactions,
     commentaryLog,
   };

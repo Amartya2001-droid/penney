@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddExpenseModal } from '../src/components/AddExpenseModal';
 import { Button } from '../src/components/Button';
+import { CategoryBudgetsCard } from '../src/components/CategoryBudgetsCard';
 import { EmptyState } from '../src/components/EmptyState';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { NoticeBanner } from '../src/components/NoticeBanner';
@@ -25,6 +26,7 @@ import { useTodayKey } from '../src/hooks/useTodayKey';
 import { useUndoableDelete } from '../src/hooks/useUndoableDelete';
 import { usePenneyStore } from '../src/store/usePenneyStore';
 import type { Transaction } from '../src/types';
+import { summarizeCategoryBudgets } from '../src/utils/categoryBudgets';
 import { dateFromKey } from '../src/utils/dates';
 import { formatLongDate } from '../src/utils/formatDate';
 import { formatCurrency } from '../src/utils/money';
@@ -48,6 +50,7 @@ export default function DashboardScreen() {
   const hasHydrated = usePenneyStore((s) => s.hasHydrated);
   const budget = usePenneyStore((s) => s.budget);
   const transactions = usePenneyStore((s) => s.transactions);
+  const categoryBudgets = usePenneyStore((s) => s.categoryBudgets);
   const storageWarning = usePenneyStore((s) => s.storageWarning);
   const dismissStorageWarning = usePenneyStore((s) => s.dismissStorageWarning);
   const snapshot = usePenneySnapshot(refDate);
@@ -66,6 +69,10 @@ export default function DashboardScreen() {
   const streak = useMemo(
     () => (budget ? summarizeStreaks(transactions, budget, todayKey) : null),
     [transactions, budget, todayKey],
+  );
+  const categoryLimits = useMemo(
+    () => summarizeCategoryBudgets(transactions, categoryBudgets, todayKey),
+    [transactions, categoryBudgets, todayKey],
   );
 
   if (!hasHydrated) return <LoadingScreen />;
@@ -110,6 +117,7 @@ export default function DashboardScreen() {
         <SummaryStats snapshot={snapshot} />
         {week ? <WeekGlance summary={week} onPress={() => router.push('/week')} /> : null}
         {streak ? <StreakCard streak={streak} todayKey={todayKey} /> : null}
+        <CategoryBudgetsCard summary={categoryLimits} onEdit={() => router.push('/settings')} />
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>

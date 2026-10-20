@@ -1,7 +1,7 @@
-import { DEMO_PRESETS, buildDemoPreset, previewDemoPreset } from '../demo/presets';
+import { DEMO_CATEGORY_BUDGETS, DEMO_PRESETS, buildDemoPreset, previewDemoPreset } from '../demo/presets';
 import { buildCommentaryContext } from '../services/penney/buildCommentaryContext';
 import { getDaysInMonth, monthKeyOf, toDateKey } from '../utils/dates';
-import { validateBudget, validateTransactionInput } from '../utils/validation';
+import { validateBudget, validateCategoryBudgets, validateTransactionInput } from '../utils/validation';
 
 // Short month, leap February, 30- and 31-day months.
 const MONTHS: [number, number][] = [
@@ -44,5 +44,11 @@ describe('demo presets', () => {
   it('always includes four takeouts in "4 Takeouts Deep"', () => {
     const data = buildDemoPreset('takeouts_deep', new Date(2026, 9, 2, 12));
     expect(data.transactions.filter((t) => t.category === 'takeout')).toHaveLength(4);
+  });
+
+  it('ships valid example category limits that add up to the demo discretionary budget', () => {
+    expect(validateCategoryBudgets(DEMO_CATEGORY_BUDGETS)).toEqual([]);
+    const total = Object.values(DEMO_CATEGORY_BUDGETS).reduce<number>((s, v) => s + (v ?? 0), 0);
+    expect(total).toBe(1150);
   });
 });

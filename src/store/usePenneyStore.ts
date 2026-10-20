@@ -3,15 +3,15 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { isEssentialCategory } from '../constants/categories';
 import type { AppearancePreference } from '../constants/theme';
-import type { NewTransactionInput, PenneyCommentary, Transaction, UserBudget } from '../types';
+import type { CategoryBudgets, NewTransactionInput, PenneyCommentary, Transaction, UserBudget } from '../types';
 import { toDateKey } from '../utils/dates';
 import { generateId } from '../utils/id';
 import { roundCurrency } from '../utils/money';
-import { validateBudget, validateTransactionInput } from '../utils/validation';
+import { validateBudget, validateCategoryBudgets, validateTransactionInput } from '../utils/validation';
 import { sanitizePersistedState, type PersistedPenneyData } from './sanitizePersisted';
 
 const MAX_COMMENTARY_LOG = 60;
-const STORE_VERSION = 3;
+const STORE_VERSION = 4;
 
 export interface PenneyState {
   budget: UserBudget | null;
@@ -21,6 +21,8 @@ export interface PenneyState {
   commentaryLog: PenneyCommentary[];
   /** Light, dark, or follow the device. A device preference, so Reset all data keeps it. */
   appearance: AppearancePreference;
+  /** Optional monthly limits for discretionary categories. Planning only; never affects Penney's mood. */
+  categoryBudgets: CategoryBudgets;
   /** True once persisted data has loaded from storage. Not persisted. */
   hasHydrated: boolean;
   /** Set when saved data was partly unreadable on load. Not persisted. */
@@ -30,6 +32,8 @@ export interface PenneyState {
 export interface PenneyActions {
   /** Validates and saves the budget. Throws an Error listing problems if invalid. */
   setBudget: (budget: UserBudget) => void;
+  /** Replaces all category limits (a missing category means no limit). Throws if invalid. */
+  setCategoryBudgets: (budgets: CategoryBudgets) => void;
   /** Validates, completes, and saves a transaction. Returns it. Throws if invalid. */
   addTransaction: (input: NewTransactionInput) => Transaction;
   /** Validates and replaces an existing transaction's fields, keeping its id. Throws if invalid or missing. */
@@ -51,6 +55,7 @@ const initialData: PersistedPenneyData = {
   transactions: [],
   commentaryLog: [],
   appearance: 'system',
+  categoryBudgets: {},
 };
 
 function sortNewestFirst(transactions: Transaction[]): Transaction[] {
@@ -88,6 +93,17 @@ export const usePenneyStore = create<PenneyStore>()(
             },
           },
         });
+      },
+
+      setCategoryBudgets: (budgets) => {
+        const errors = validateCategoryBudgets(budgets);
+        if (errors.length > 0) throw new Error(errors.join(' '));
+
+        const rounded: CategoryBudgets = {};
+        for (const [category, limit] of Object.entries(budgets) as [keyof CategoryBudgets, number | undefined][]) {
+          if (limit !== undefined) rounded[category] = roundCurrency(limit);
+        }
+        set({ categoryBudgets: rounded });
       },
 
       addTransaction: (input) => {
@@ -174,8 +190,9 @@ export const usePenneyStore = create<PenneyStore>()(
         transactions: state.transactions,
         commentaryLog: state.commentaryLog,
         appearance: state.appearance,
+        categoryBudgets: state.categoryBudgets,
       }),
-      // v2 added no fields; v3 added `appearance`. Validation in `merge` covers every shape.
+      // v2 added no fields; v3 added `appearance`; v4 added `categoryBudgets`. Validation in `merge` covers every shape.
       migrate: (persisted) => persisted as PersistedPenneyData,
       merge: (persisted, current) => {
         const { data, droppedRecords } = sanitizePersistedState(persisted);
