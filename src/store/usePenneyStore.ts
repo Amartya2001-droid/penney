@@ -7,11 +7,12 @@ import type { CategoryBudgets, NewTransactionInput, PenneyCommentary, Transactio
 import { toDateKey } from '../utils/dates';
 import { generateId } from '../utils/id';
 import { roundCurrency } from '../utils/money';
+import { DEFAULT_REMINDER, isReminderSettings, type ReminderSettings } from '../utils/reminders';
 import { validateBudget, validateCategoryBudgets, validateTransactionInput } from '../utils/validation';
 import { sanitizePersistedState, type PersistedPenneyData } from './sanitizePersisted';
 
 const MAX_COMMENTARY_LOG = 60;
-const STORE_VERSION = 4;
+const STORE_VERSION = 5;
 
 export interface PenneyState {
   budget: UserBudget | null;
@@ -23,6 +24,8 @@ export interface PenneyState {
   appearance: AppearancePreference;
   /** Optional monthly limits for discretionary categories. Planning only; never affects Penney's mood. */
   categoryBudgets: CategoryBudgets;
+  /** Daily logging reminder. Reset all data turns it off but keeps the chosen time. */
+  reminder: ReminderSettings;
   /** True once persisted data has loaded from storage. Not persisted. */
   hasHydrated: boolean;
   /** Set when saved data was partly unreadable on load. Not persisted. */
@@ -44,6 +47,8 @@ export interface PenneyActions {
   logCommentary: (commentary: PenneyCommentary) => void;
   resetAll: () => void;
   setAppearance: (appearance: AppearancePreference) => void;
+  /** Updates the reminder settings. Throws if the result isn't a valid time. */
+  setReminder: (changes: Partial<ReminderSettings>) => void;
   dismissStorageWarning: () => void;
   setHasHydrated: (value: boolean) => void;
 }
@@ -56,6 +61,7 @@ const initialData: PersistedPenneyData = {
   commentaryLog: [],
   appearance: 'system',
   categoryBudgets: {},
+  reminder: { ...DEFAULT_REMINDER },
 };
 
 function sortNewestFirst(transactions: Transaction[]): Transaction[] {
@@ -166,11 +172,22 @@ export const usePenneyStore = create<PenneyStore>()(
       },
 
       resetAll: () => {
-        set((state) => ({ ...initialData, appearance: state.appearance, storageWarning: null }));
+        set((state) => ({
+          ...initialData,
+          appearance: state.appearance,
+          reminder: { ...state.reminder, enabled: false },
+          storageWarning: null,
+        }));
       },
 
       setAppearance: (appearance) => {
         set({ appearance });
+      },
+
+      setReminder: (changes) => {
+        const next = { ...get().reminder, ...changes };
+        if (!isReminderSettings(next)) throw new Error('Reminder time must be a valid time of day.');
+        set({ reminder: next });
       },
 
       dismissStorageWarning: () => {
@@ -191,8 +208,10 @@ export const usePenneyStore = create<PenneyStore>()(
         commentaryLog: state.commentaryLog,
         appearance: state.appearance,
         categoryBudgets: state.categoryBudgets,
+        reminder: state.reminder,
       }),
-      // v2 added no fields; v3 added `appearance`; v4 added `categoryBudgets`. Validation in `merge` covers every shape.
+      // v2 added no fields; v3 `appearance`; v4 `categoryBudgets`; v5 `reminder`.
+      // Validation in `merge` covers every shape.
       migrate: (persisted) => persisted as PersistedPenneyData,
       merge: (persisted, current) => {
         const { data, droppedRecords } = sanitizePersistedState(persisted);

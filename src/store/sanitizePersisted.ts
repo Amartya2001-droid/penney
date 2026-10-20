@@ -10,6 +10,7 @@ import {
   type UserBudget,
 } from '../types';
 import { isValidDateKey } from '../utils/dates';
+import { DEFAULT_REMINDER, isReminderSettings, type ReminderSettings } from '../utils/reminders';
 
 export interface PersistedPenneyData {
   budget: UserBudget | null;
@@ -17,6 +18,7 @@ export interface PersistedPenneyData {
   commentaryLog: PenneyCommentary[];
   appearance: AppearancePreference;
   categoryBudgets: CategoryBudgets;
+  reminder: ReminderSettings;
 }
 
 export interface SanitizeResult {
@@ -96,7 +98,14 @@ function readCommentary(raw: unknown): PenneyCommentary | null {
 export function sanitizePersistedState(raw: unknown): SanitizeResult {
   if (!isObject(raw)) {
     return {
-      data: { budget: null, transactions: [], commentaryLog: [], appearance: 'system', categoryBudgets: {} },
+      data: {
+        budget: null,
+        transactions: [],
+        commentaryLog: [],
+        appearance: 'system',
+        categoryBudgets: {},
+        reminder: { ...DEFAULT_REMINDER },
+      },
       droppedRecords: 0,
     };
   }
@@ -140,5 +149,13 @@ export function sanitizePersistedState(raw: unknown): SanitizeResult {
     }
   }
 
-  return { data: { budget, transactions, commentaryLog, appearance, categoryBudgets }, droppedRecords };
+  // A preference, like appearance: anything unreadable quietly falls back to the default (off).
+  const reminder = isReminderSettings(raw.reminder)
+    ? { enabled: raw.reminder.enabled, hour: raw.reminder.hour, minute: raw.reminder.minute }
+    : { ...DEFAULT_REMINDER };
+
+  return {
+    data: { budget, transactions, commentaryLog, appearance, categoryBudgets, reminder },
+    droppedRecords,
+  };
 }

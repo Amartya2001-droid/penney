@@ -4,6 +4,7 @@ import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppErrorFallback } from '../src/components/AppErrorFallback';
+import { useReminderSync } from '../src/hooks/useReminderSync';
 import { useTheme } from '../src/theme/useTheme';
 
 /**
@@ -33,6 +34,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 export default function RootLayout() {
   const { scheme, colors } = useTheme();
   useRootBackground(colors.background);
+  useReminderSync();
   return (
     <SafeAreaProvider>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />

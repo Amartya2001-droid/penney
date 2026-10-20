@@ -19,6 +19,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#F6F3EC"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#2B2116"
+        }
       ]
     ],
     "ios": {

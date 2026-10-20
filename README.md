@@ -25,6 +25,8 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
   30, 60, and 100 days
 - **Category limits**: optional monthly caps for takeout, Amazon, shopping, and entertainment,
   with progress bars on the dashboard and a heads-up in the expense form before you go over
+- **Daily reminder** (iOS and Android): a nudge at a time you choose, only on days you haven't
+  logged anything yet; tapping it opens Add Expense
 - **Demo presets** that show every mood instantly
 - **Light and dark themes**: follows the device by default, or pick Light or Dark in Settings
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
@@ -104,6 +106,25 @@ leave the key out of the app and run a small server that:
 Then set only `PENNEY_AI_BASE_URL` (or `EXPO_PUBLIC_PENNEY_AI_BASE_URL`) to that server's
 origin. Add rate limiting there, since the endpoint is public.
 
+## Reminders
+
+Turn on **Settings → Daily reminder** and pick a time (in 30-minute steps). Penney asks for
+notification permission the first time.
+
+- Reminders are local notifications; nothing is sent to a server.
+- Instead of one repeating alarm, the next 14 days are scheduled as separate one-off reminders,
+  so a day that already has an expense can be skipped. They're rescheduled whenever the app opens,
+  an expense is added or edited, or the date changes, so the window keeps rolling forward. If the
+  app isn't opened for two weeks, the reminders stop until it is.
+- Tapping a reminder opens the dashboard with Add Expense ready.
+- Only Penney's own scheduled notifications are ever cancelled.
+- **Reset all data** turns reminders off (the chosen time is kept).
+- Browsers can't schedule them, so the web build shows a note instead
+  (`src/services/reminders/reminderScheduler.web.ts`).
+
+The schedule logic is pure and tested in `src/utils/reminders.ts`; the notification calls are in
+`src/services/reminders/reminderScheduler.ts`.
+
 ## Demo presets
 
 | Preset               | Penney's mood        | Scenario                                         |
@@ -169,9 +190,10 @@ src/types/                Data model and engine result types
 src/constants/            Categories, thresholds, theme palettes, mood visuals, persona
 src/theme/                Theme hook and themed styles
 src/engine/               Pace and mood calculations
-src/store/                Zustand store, persistence, load-time validation
-src/hooks/                Snapshot, daily quote, today's date, undo
+src/store/                Zustand stores, persistence, load-time validation
+src/hooks/                Snapshot, daily quote, today's date, undo, reminder sync
 src/services/penney/      Prompt builder, AI provider, offline fallback
+src/services/reminders/   Local notification scheduling (with a web stub)
 src/config/               AI and demo settings
 src/demo/                 Demo presets
 src/components/           UI components
@@ -190,8 +212,8 @@ palettes (4.5:1 for body text), so a palette change that hurts readability fails
 
 ## Data and privacy
 
-- Budget, category limits, expenses, and quotes are stored locally with AsyncStorage (browser storage on web).
-  There's no account and no server.
+- Budget, category limits, expenses, quotes, and reminder settings are stored locally with
+  AsyncStorage (browser storage on web). There's no account and no server.
 - Saved data is validated when the app loads. Unreadable records are skipped and the user is
   told, instead of the app crashing.
 - **Settings → Export backup** produces a JSON file (download on web, share sheet on mobile).
@@ -238,7 +260,8 @@ Build numbers are managed remotely and auto-increment on production builds (`eas
 - [x] Settings, history with edit/delete, empty states, error handling, tests, release config
 - [x] Dark mode
 - [ ] Backup import
-- [ ] Recurring expenses and reminders
+- [x] Daily logging reminders
+- [ ] Recurring expenses
 - [ ] Multi-currency (currently CAD)
 
 ## License

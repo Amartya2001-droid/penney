@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddExpenseModal } from '../src/components/AddExpenseModal';
@@ -24,6 +24,7 @@ import { useDailyCommentary } from '../src/hooks/useDailyCommentary';
 import { usePenneySnapshot } from '../src/hooks/usePenneySnapshot';
 import { useTodayKey } from '../src/hooks/useTodayKey';
 import { useUndoableDelete } from '../src/hooks/useUndoableDelete';
+import { useIntentStore } from '../src/store/useIntentStore';
 import { usePenneyStore } from '../src/store/usePenneyStore';
 import type { Transaction } from '../src/types';
 import { summarizeCategoryBudgets } from '../src/utils/categoryBudgets';
@@ -57,6 +58,15 @@ export default function DashboardScreen() {
   const commentary = useDailyCommentary(snapshot);
   const { deleteTransaction, lastDeleted, undo, dismiss } = useUndoableDelete();
   const [modal, setModal] = useState<ModalState>({ mode: 'closed' });
+  const addExpenseRequested = useIntentStore((s) => s.addExpenseRequested);
+  const consumeAddExpense = useIntentStore((s) => s.consumeAddExpense);
+
+  // A tapped reminder asks for Add Expense: open it once the data has loaded.
+  useEffect(() => {
+    if (!addExpenseRequested || !hasHydrated || !budget) return;
+    setModal({ mode: 'add' });
+    consumeAddExpense();
+  }, [addExpenseRequested, hasHydrated, budget, consumeAddExpense]);
 
   const monthTransactions = useMemo(
     () => getMonthToDateTransactions(transactions, refDate),

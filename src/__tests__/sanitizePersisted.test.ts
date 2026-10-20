@@ -61,6 +61,7 @@ describe('sanitizePersistedState', () => {
       commentaryLog: [],
       appearance: 'system',
       categoryBudgets: {},
+      reminder: { enabled: false, hour: 20, minute: 0 },
     });
   });
 

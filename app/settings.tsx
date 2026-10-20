@@ -8,6 +8,7 @@ import { Button } from '../src/components/Button';
 import { CategoryBudgetForm } from '../src/components/CategoryBudgetForm';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { NoticeBanner } from '../src/components/NoticeBanner';
+import { ReminderSettings } from '../src/components/ReminderSettings';
 import { ScreenHeader } from '../src/components/ScreenHeader';
 import { SegmentedToggle, type SegmentOption } from '../src/components/SegmentedToggle';
 import { aiConfig } from '../src/config/aiConfig';
@@ -96,6 +97,10 @@ export default function SettingsScreen() {
           description="Optional monthly caps for discretionary categories. Leave a field blank for no limit. They're for planning; Penney's mood still follows your overall budget."
         >
           <CategoryBudgetForm todayKey={todayKey} />
+        </Section>
+
+        <Section title="Daily reminder">
+          <ReminderSettings />
         </Section>
 
         <Section title="Appearance" description="System matches your device's light or dark setting.">
