@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Penney",
+    "slug": "penney",
+    "version": "1.0.0",
+    "scheme": "penney",
+    "description": "A gamified savings companion: a deadpan coin whose mood tracks your discretionary spending.",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F6F3EC",
+    "icon": "./assets/images/icon.png",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#F6F3EC"
+        }
+      ]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.amartyakarmakar.penney",
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.amartyakarmakar.penney",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#F6F3EC"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Penney",
+      "shortName": "Penney",
+      "themeColor": "#F6F3EC",
+      "backgroundColor": "#F6F3EC"
+    }
+  }
+}
