@@ -25,6 +25,8 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
   30, 60, and 100 days
 - **Category limits**: optional monthly caps for takeout, Amazon, shopping, and entertainment,
   with progress bars on the dashboard and a heads-up in the expense form before you go over
+- **Spending charts**: the month's running total against its allowance (tap to read any day),
+  where the money went by category, and month by month against budget, each with a table view
 - **Daily reminder** (iOS and Android): a nudge at a time you choose, only on days you haven't
   logged anything yet; tapping it opens Add Expense
 - **Demo presets** that show every mood instantly
@@ -169,6 +171,11 @@ is marked "spending faster than the month" once spending passes the limit's shar
 far (e.g. 20/31 of it on the 20th), "nearly used up" at 85%, and "over" past 100%. See
 `src/utils/categoryBudgets.ts`.
 
+The **spending charts** draw the same numbers the dashboard uses: the "month so far" line is
+discretionary spending against the engine's allowance to date, so it always agrees with the pace
+bar. The month-by-month view applies the current budget to past months, because past budgets
+aren't stored. The chart logic is in `src/utils/charts.ts`.
+
 Thresholds are in `src/constants/thresholds.ts`. The engine (`src/engine/`) is pure TypeScript
 with no React, and is covered by tests in `src/__tests__/`.
 
@@ -181,6 +188,7 @@ app/                      Screens (expo-router)
   onboarding.tsx          First-run budget setup
   transactions.tsx        History: month summary, grouped list, edit/delete
   week.tsx                Weekly summary: day-by-day chart, comparison, verdict
+  charts.tsx              Spending charts: month so far, categories, month by month
   settings.tsx            Budget, category limits, appearance, AI status, backup, demo, reset
   demo.tsx                Demo presets
   +not-found.tsx          Unknown routes
@@ -196,7 +204,7 @@ src/services/penney/      Prompt builder, AI provider, offline fallback
 src/services/reminders/   Local notification scheduling (with a web stub)
 src/config/               AI and demo settings
 src/demo/                 Demo presets
-src/components/           UI components
+src/components/           UI components (charts in src/components/charts/)
 src/utils/                Dates, money, parsing, validation, summaries, streaks, limits, export
 src/__tests__/            Jest tests
 ```

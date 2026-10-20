@@ -6,6 +6,7 @@ import { AddExpenseModal } from '../src/components/AddExpenseModal';
 import { Button } from '../src/components/Button';
 import { CategoryBudgetsCard } from '../src/components/CategoryBudgetsCard';
 import { EmptyState } from '../src/components/EmptyState';
+import { LinkCard } from '../src/components/LinkCard';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { NoticeBanner } from '../src/components/NoticeBanner';
 import { PaceProgressBar } from '../src/components/PaceProgressBar';
@@ -126,6 +127,11 @@ export default function DashboardScreen() {
         <PaceProgressBar snapshot={snapshot} />
         <SummaryStats snapshot={snapshot} />
         {week ? <WeekGlance summary={week} onPress={() => router.push('/week')} /> : null}
+        <LinkCard
+          title="Spending charts"
+          detail="Month so far, where it went, and month by month"
+          onPress={() => router.push('/charts')}
+        />
         {streak ? <StreakCard streak={streak} todayKey={todayKey} /> : null}
         <CategoryBudgetsCard summary={categoryLimits} onEdit={() => router.push('/settings')} />
 

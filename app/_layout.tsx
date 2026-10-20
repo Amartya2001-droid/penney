@@ -48,6 +48,7 @@ export default function RootLayout() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="transactions" />
         <Stack.Screen name="week" />
+        <Stack.Screen name="charts" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="demo" />
         <Stack.Screen name="+not-found" />

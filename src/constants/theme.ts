@@ -39,6 +39,10 @@ export interface ThemeColors {
   onInverse: string;
   inverseAccent: string;
   overlay: string;
+  /** The one highlighted series in a chart (validated at 3:1+ on surface in each theme). */
+  chartAccent: string;
+  /** Reference series drawn quietly behind the accent, e.g. the allowance line. */
+  chartContext: string;
   /** The soft shadow under Penney. */
   coinShadow: string;
   shadow: string;
@@ -73,6 +77,8 @@ export const lightColors: ThemeColors = {
   onInverse: '#FFFFFF',
   inverseAccent: '#F2C14E',
   overlay: 'rgba(28, 27, 25, 0.45)',
+  chartAccent: '#2A78D6',
+  chartContext: '#8A857C',
   coinShadow: 'rgba(43, 33, 22, 0.15)',
   shadow: '#000000',
 };
@@ -106,6 +112,8 @@ export const darkColors: ThemeColors = {
   onInverse: '#161513',
   inverseAccent: '#8A5A12',
   overlay: 'rgba(0, 0, 0, 0.6)',
+  chartAccent: '#3987E5',
+  chartContext: '#7E796F',
   coinShadow: 'rgba(0, 0, 0, 0.45)',
   shadow: '#000000',
 };

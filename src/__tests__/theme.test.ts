@@ -39,6 +39,9 @@ describe('palettes', () => {
       ['text on essential badge', c.text, c.badgeEssential, BODY],
       ['text on discretionary badge', c.text, c.badgeDiscretionary, BODY],
       ['border is visible on background', c.border, c.background, 1.15],
+      // Chart marks are graphics, so WCAG 1.4.11 asks for 3:1 against the chart's surface.
+      ['chart accent line on surface', c.chartAccent, c.surface, 3],
+      ['chart context line on surface', c.chartContext, c.surface, 3],
       ...TONES.flatMap((t): [string, string, string, number][] => [
         [`${t} text on surface`, c[t], c.surface, BODY],
         [`${t} text on background`, c[t], c.background, BODY],
