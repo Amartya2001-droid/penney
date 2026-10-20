@@ -10,6 +10,7 @@ import { NoticeBanner } from '../src/components/NoticeBanner';
 import { PaceProgressBar } from '../src/components/PaceProgressBar';
 import { PenneyCharacter } from '../src/components/PenneyCharacter';
 import { PenneyQuoteBox } from '../src/components/PenneyQuoteBox';
+import { StreakCard } from '../src/components/StreakCard';
 import { SummaryStats } from '../src/components/SummaryStats';
 import { TransactionRow } from '../src/components/TransactionRow';
 import { UndoToast } from '../src/components/UndoToast';
@@ -27,6 +28,7 @@ import type { Transaction } from '../src/types';
 import { dateFromKey } from '../src/utils/dates';
 import { formatLongDate } from '../src/utils/formatDate';
 import { formatCurrency } from '../src/utils/money';
+import { summarizeStreaks } from '../src/utils/streaks';
 import { startOfWeek, summarizeWeek } from '../src/utils/weekSummary';
 import { makeStyles, useTheme } from '../src/theme/useTheme';
 
@@ -59,6 +61,10 @@ export default function DashboardScreen() {
   );
   const week = useMemo(
     () => (budget ? summarizeWeek(transactions, budget, startOfWeek(todayKey), todayKey) : null),
+    [transactions, budget, todayKey],
+  );
+  const streak = useMemo(
+    () => (budget ? summarizeStreaks(transactions, budget, todayKey) : null),
     [transactions, budget, todayKey],
   );
 
@@ -103,6 +109,7 @@ export default function DashboardScreen() {
         <PaceProgressBar snapshot={snapshot} />
         <SummaryStats snapshot={snapshot} />
         {week ? <WeekGlance summary={week} onPress={() => router.push('/week')} /> : null}
+        {streak ? <StreakCard streak={streak} todayKey={todayKey} /> : null}
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>

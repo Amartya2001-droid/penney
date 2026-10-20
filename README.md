@@ -20,6 +20,9 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 - **History**: month-by-month summary (totals, top categories), grouped by day, with filters
 - **Weekly summary**: Monday–Sunday spending against daily targets, a day-by-day chart, a
   like-for-like comparison with last week, no-spend days, and Penney's verdict on the week
+- **Savings streaks**: days in a row with discretionary spending within that day's target, plus
+  the best streak, a no-spend streak, the last two weeks at a glance, and milestones at 3, 7, 14,
+  30, 60, and 100 days
 - **Demo presets** that show every mood instantly
 - **Light and dark themes**: follows the device by default, or pick Light or Dark in Settings
 - **Data safety**: saved data is validated on load, a crash screen offers recovery, and a JSON
@@ -130,6 +133,13 @@ The weekly summary uses the same bands, comparing the week's discretionary spend
 of the engine's daily targets for the days so far. Weeks run Monday to Sunday (`WEEK_STARTS_ON` in
 `src/utils/weekSummary.ts`), and a week in progress is compared with the same days of last week.
 
+A **savings streak** counts finished days in a row where discretionary spending stayed within
+that day's target (the same targets the weekly chart shows). Essentials never break a streak, and
+an unplanned essential lowers only the targets of the days after it. Today joins the streak once
+it's over; going over today's target ends the streak straight away. Counting starts at the oldest
+logged expense, so days before someone started using Penney aren't free wins. See
+`src/utils/streaks.ts`.
+
 Thresholds are in `src/constants/thresholds.ts`. The engine (`src/engine/`) is pure TypeScript
 with no React, and is covered by tests in `src/__tests__/`.
 
@@ -157,7 +167,7 @@ src/services/penney/      Prompt builder, AI provider, offline fallback
 src/config/               AI and demo settings
 src/demo/                 Demo presets
 src/components/           UI components
-src/utils/                Dates, money, parsing, validation, month and week summaries, export
+src/utils/                Dates, money, parsing, validation, month/week summaries, streaks, export
 src/__tests__/            Jest tests
 ```
 
