@@ -29,7 +29,7 @@ export class PenneyAiError extends Error {
 type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
 interface MessagesResponse {
-  content?: Array<{ type?: string; text?: string }>;
+  content?: { type?: string; text?: string }[];
 }
 
 function extractText(data: unknown): string {

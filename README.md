@@ -6,6 +6,17 @@ groceries never hurt his mood; takeout, shopping, and other non-essentials do.
 
 Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stays on the device.
 
+## Current status
+
+No live URL is recorded in this repository or its GitHub homepage; GitHub Pages is disabled.
+Not live yet — blocked by choosing and configuring a deployment target (or providing an existing
+live URL). Local web builds work. Day 1 verification passed all 203 Jest tests and exercised
+web backup export, file and pasted-text restore, replacement confirmation, Undo, duplicate-safe
+merge, and persistence after reload. Native file-picker/share-sheet verification still needs
+an iOS or Android device or simulator. See [Day 1 verification](docs/day-1-verification.md).
+
+GitHub Actions runs typecheck, lint, tests, and the web build on every push and pull request.
+
 ## Features
 
 - **Budget setup**: monthly net income, savings goal, and fixed essentials (rent, utilities,
