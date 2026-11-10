@@ -2,7 +2,7 @@ export function roundCurrency(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-export function sumAmounts(items: ReadonlyArray<{ amount: number }>): number {
+export function sumAmounts(items: readonly { amount: number }[]): number {
   return items.reduce((sum, item) => sum + item.amount, 0);
 }
 
