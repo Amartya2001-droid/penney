@@ -1,0 +1,72 @@
+name: Deploy web to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: true
+      EXPO_NO_TELEMETRY: 1
+      PENNEY_WEB_BASE_URL: /penney
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --ci --runInBand
+      - run: npm run build:web
+      # Pages has no SPA rewrite rules. Its custom 404 serves the same router
+      # for direct links/reloads, retaining the original screen URL.
+      - name: Prepare Pages fallback
+        run: |
+          node - <<'NODE'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const html = fs.readFileSync('dist/index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)];
+          assert(scripts.length > 0, 'Export must contain a JS bundle');
+          for (const [, src] of scripts) {
+            assert(src.startsWith('/penney/'), `Missing Pages prefix: ${src}`);
+            assert(fs.existsSync(`dist/${src.slice('/penney/'.length)}`), `Missing bundle: ${src}`);
+          }
+          NODE
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Pages must be enabled separately in repository settings; never enable it here.
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
