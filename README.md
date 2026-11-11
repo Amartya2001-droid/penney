@@ -8,14 +8,17 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 
 ## Current status
 
-No live URL is recorded in this repository or its GitHub homepage; GitHub Pages is disabled.
-Not live yet — blocked by choosing and configuring a deployment target (or providing an existing
-live URL). Local web builds work. Day 1 verification passed all 203 Jest tests and exercised
-web backup export, file and pasted-text restore, replacement confirmation, Undo, duplicate-safe
-merge, and persistence after reload. Native file-picker/share-sheet verification still needs
-an iOS or Android device or simulator. See [Day 1 verification](docs/day-1-verification.md).
+Not live yet — blocked by merging the Pages workflow and separately enabling GitHub Pages
+with **Source: GitHub Actions** in repository settings. GitHub Pages is the decided deployment
+target. Expected URL after deployment: https://amartya2001-droid.github.io/penney/ (not yet verified live).
+Local web builds work. Day 2 re-verification passed all 203 Jest tests and exercised web backup
+export, file and pasted-text restore, replacement confirmation, Undo, duplicate-safe merge,
+and persistence after reload. Native file-picker/share-sheet verification still needs an iOS
+or Android device or simulator. See [Day 2 verification](docs/day-2-verification.md) and [Day 1 verification](docs/day-1-verification.md).
 
 GitHub Actions runs typecheck, lint, tests, and the web build on every push and pull request.
+The Pages workflow also checks the Pages export on PRs, then deploys only from `main`.
+Pages settings are intentionally not enabled by the workflow.
 
 ## Features
 
@@ -253,8 +256,15 @@ palettes (4.5:1 for body text), so a palette change that hurts readability fails
 (requires Python 3 and Pillow: `pip install pillow`). Run `python3 scripts/generate-icons.py`
 from the project root to recreate them, or replace them with your own artwork at the same sizes.
 
-**Web.** `npm run build:web` outputs a static single-page app to `dist/`. Configure your host
-to serve `index.html` for unknown paths (an SPA rewrite) so deep links like `/settings` work.
+**Web.** `npm run build:web` outputs a static single-page app to `dist/` for local hosting.
+For GitHub Pages, `.github/workflows/pages.yml` builds with `PENNEY_WEB_BASE_URL=/penney`
+so assets and router links use the repository prefix. It copies `index.html` to `404.html`
+for direct screen links and reloads (Pages returns HTTP 404 for these fallback responses,
+but the app loads at the original URL), and uploads/deploys the `dist/` artifact. No API key
+or extra deploy secret is needed; deployment uses the workflow's scoped GitHub token.
+After merging, Amartya must enable Pages with **Source: GitHub Actions**, then re-run the
+workflow if the initial deployment failed while Pages was disabled. Confirm the workflow's
+reported URL and update live status after the first successful deployment.
 
 **iOS and Android** with [EAS Build](https://docs.expo.dev/build/introduction/):
 

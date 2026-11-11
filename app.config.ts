@@ -9,6 +9,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: config.name ?? 'Penney',
   slug: config.slug ?? 'penney',
+  // Only Pages exports opt into the repository path prefix.
+  experiments: {
+    ...config.experiments,
+    ...(process.env.PENNEY_WEB_BASE_URL ? { baseUrl: process.env.PENNEY_WEB_BASE_URL } : {}),
+  },
   extra: {
     ...config.extra,
     penneyAi: {
