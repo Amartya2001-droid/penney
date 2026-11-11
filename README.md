@@ -31,7 +31,13 @@ Pages settings are intentionally not enabled by the workflow.
 - **Unplanned essentials** (emergency repairs, going over a fixed budget) lower the daily target
   for the rest of the month without hurting Penney's mood
 - **Daily quote**: one line a day from the AI, with an offline line bank as the fallback
-- **History**: month-by-month summary (totals, top categories), grouped by day, with filters
+- **History**: month summary, day groups, edit/delete with Undo, search in a selected month
+  or across all months, and combined category/type filters with matching counts and totals
+- **CSV download (web)**: export exactly the displayed search results for a spreadsheet;
+  amounts are in CAD and note cells are escaped to prevent spreadsheet formulas. CSV is
+  a report, not an import format; JSON backup remains the way to transfer and restore data
+- **Browser calendar**: choose older expense dates directly rather than tapping back one day
+  at a time; future dates are rejected. Native builds retain the day stepper
 - **Weekly summary**: Monday–Sunday spending against daily targets, a day-by-day chart, a
   like-for-like comparison with last week, no-spend days, and Penney's verdict on the week
 - **Savings streaks**: days in a row with discretionary spending within that day's target, plus
@@ -222,7 +228,7 @@ src/services/backup/      Backup file picker (with a web version)
 src/config/               AI and demo settings
 src/demo/                 Demo presets
 src/components/           UI components (charts in src/components/charts/)
-src/utils/                Dates, money, parsing, validation, summaries, streaks, limits, export
+src/utils/                Dates, money, parsing, validation, summaries, streaks, limits, search, CSV, export
 src/__tests__/            Jest tests
 ```
 

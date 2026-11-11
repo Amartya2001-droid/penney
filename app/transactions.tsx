@@ -1,9 +1,11 @@
 import { Redirect } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { SectionList, StyleSheet, Text, View } from 'react-native';
+import { Platform, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddExpenseModal } from '../src/components/AddExpenseModal';
 import { Button } from '../src/components/Button';
+import { Chip } from '../src/components/Chip';
+import { NoticeBanner } from '../src/components/NoticeBanner';
 import { EmptyState } from '../src/components/EmptyState';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import { MonthSummaryCard } from '../src/components/MonthSummaryCard';
@@ -12,18 +14,20 @@ import { ScreenHeader } from '../src/components/ScreenHeader';
 import { SegmentedToggle, type SegmentOption } from '../src/components/SegmentedToggle';
 import { TransactionRow } from '../src/components/TransactionRow';
 import { UndoToast } from '../src/components/UndoToast';
-import { CATEGORY_META } from '../src/constants/categories';
-import { spacing } from '../src/constants/theme';
+import { ALL_CATEGORIES, CATEGORY_META } from '../src/constants/categories';
+import { radius, spacing } from '../src/constants/theme';
 import { getFixedExpensesTotal } from '../src/engine/calculations';
 import { useTodayKey } from '../src/hooks/useTodayKey';
 import { useUndoableDelete } from '../src/hooks/useUndoableDelete';
 import { usePenneyStore } from '../src/store/usePenneyStore';
-import type { Transaction } from '../src/types';
+import type { Category, Transaction } from '../src/types';
 import { daysBetween, monthKeyOf } from '../src/utils/dates';
 import { formatLongDate } from '../src/utils/formatDate';
 import { formatMonthLabel, shiftMonthKey, summarizeMonth, type MonthKey } from '../src/utils/monthSummary';
 import { formatCurrency } from '../src/utils/money';
-import { makeStyles } from '../src/theme/useTheme';
+import { downloadFile } from '../src/utils/downloadFile';
+import { filterTransactions, transactionsToCsv } from '../src/utils/transactionSearch';
+import { makeStyles, useTheme } from '../src/theme/useTheme';
 
 type Filter = 'all' | 'discretionary' | 'essential';
 
@@ -44,6 +48,7 @@ function dayHeading(dateKey: string, todayKey: string): string {
 
 export default function TransactionsScreen() {
   const styles = useStyles();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const todayKey = useTodayKey();
   const thisMonth = monthKeyOf(todayKey);
@@ -55,6 +60,10 @@ export default function TransactionsScreen() {
 
   const [monthKey, setMonthKey] = useState<MonthKey>(thisMonth);
   const [filter, setFilter] = useState<Filter>('all');
+  const [query, setQuery] = useState('');
+  const [scope, setScope] = useState<'month' | 'all'>('month');
+  const [category, setCategory] = useState<Category | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>({ mode: 'closed' });
 
   const summary = useMemo(() => summarizeMonth(transactions, monthKey), [transactions, monthKey]);
@@ -63,18 +72,31 @@ export default function TransactionsScreen() {
     [transactions, thisMonth],
   );
 
-  const sections = useMemo(
-    () =>
-      summary.days
-        .map((day) => {
-          const data = day.transactions.filter((t) =>
-            filter === 'all' ? true : filter === 'essential' ? t.is_essential : !t.is_essential,
-          );
-          return { date: day.date, total: data.reduce((s, t) => s + t.amount, 0), data };
-        })
-        .filter((section) => section.data.length > 0),
-    [summary, filter],
-  );
+  const matching = useMemo(() => filterTransactions(transactions, {
+    month: scope === 'month' ? monthKey : null, kind: filter, category, query,
+  }), [transactions, scope, monthKey, filter, category, query]);
+  const sections = useMemo(() => {
+    const groups = new Map<string, Transaction[]>();
+    for (const t of matching) {
+      const day = groups.get(t.date) ?? [];
+      day.push(t);
+      groups.set(t.date, day);
+    }
+    return [...groups].sort(([a], [b]) => b.localeCompare(a)).map(([date, data]) => ({
+      date, data, total: data.reduce((sum, t) => sum + t.amount, 0),
+    }));
+  }, [matching]);
+  const matchingTotal = matching.reduce((sum, t) => sum + t.amount, 0);
+  const hasFilters = query.trim() !== '' || category !== null || filter !== 'all';
+  const clearFilters = () => { setQuery(''); setCategory(null); setFilter('all'); };
+  const exportCsv = () => {
+    try {
+      downloadFile(transactionsToCsv(matching), `penney-expenses-${scope === 'all' ? 'all-months' : monthKey}.csv`, 'text/csv;charset=utf-8');
+      setExportError(null);
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'Could not download expenses. Please try again.');
+    }
+  };
 
   if (!hasHydrated) return <LoadingScreen />;
   if (!budget) return <Redirect href="/onboarding" />;
@@ -94,7 +116,8 @@ export default function TransactionsScreen() {
         right={<Button label="+ Add" variant="secondary" onPress={() => setModal({ mode: 'add' })} />}
       />
 
-      <PeriodSwitcher
+      <SegmentedToggle options={[{ value: 'month', label: 'Selected month' }, { value: 'all', label: 'All months' }]} value={scope} onChange={setScope} accessibilityLabel="History period" />
+      {scope === 'month' ? <PeriodSwitcher
         label={formatMonthLabel(monthKey)}
         previousLabel="Previous month"
         nextLabel="Next month"
@@ -102,19 +125,39 @@ export default function TransactionsScreen() {
         canGoNext={canGoNext}
         onPrevious={() => setMonthKey(shiftMonthKey(monthKey, -1))}
         onNext={() => setMonthKey(shiftMonthKey(monthKey, 1))}
-      />
+      /> : null}
 
-      {summary.count > 0 ? (
+      {scope === 'month' && summary.count > 0 ? (
         <>
           <MonthSummaryCard summary={summary} discretionaryBudget={discretionaryBudget} />
-          <SegmentedToggle options={FILTER_OPTIONS} value={filter} onChange={setFilter} accessibilityLabel="Filter expenses" />
         </>
       ) : null}
+      <TextInput
+        accessibilityLabel="Search expenses"
+        placeholder="Search notes, categories, dates or amounts"
+        placeholderTextColor={colors.textMuted}
+        value={query} onChangeText={setQuery} style={styles.search}
+        autoCorrect={false} returnKeyType="search"
+      />
+      <SegmentedToggle options={FILTER_OPTIONS} value={filter} onChange={setFilter} accessibilityLabel="Filter expenses" />
+      <View style={styles.categories}>
+        <Chip label="All categories" selected={category === null} onPress={() => setCategory(null)} />
+        {ALL_CATEGORIES.map((c) => <Chip key={c} label={CATEGORY_META[c].label} selected={category === c} onPress={() => setCategory(c)} />)}
+      </View>
+      <Text style={styles.results} accessibilityLiveRegion="polite">
+        {matching.length} {matching.length === 1 ? 'expense' : 'expenses'} · {formatCurrency(matchingTotal)}
+      </Text>
+      {hasFilters ? <Button label="Clear filters" variant="ghost" onPress={clearFilters} /> : null}
+      {Platform.OS === 'web' ? <>
+        <Button label="Download results as CSV" variant="secondary" disabled={matching.length === 0} onPress={exportCsv} />
+        <Text style={styles.hint}>Exports the expenses shown below in CAD. For a restorable backup, use Settings → Export backup.</Text>
+      </> : null}
+      {exportError ? <NoticeBanner tone="danger" message={exportError} onDismiss={() => setExportError(null)} /> : null}
     </View>
   );
 
   const empty =
-    summary.count === 0 ? (
+    !hasFilters && scope === 'month' && summary.count === 0 ? (
       <EmptyState
         title={isCurrentMonth ? 'No expenses yet this month' : `Nothing logged in ${formatMonthLabel(monthKey)}`}
         message={
@@ -127,10 +170,10 @@ export default function TransactionsScreen() {
       />
     ) : (
       <EmptyState
-        title={`No ${filter} expenses`}
-        message={`Nothing ${filter} was logged in ${formatMonthLabel(monthKey)}.`}
-        actionLabel="Show all"
-        onAction={() => setFilter('all')}
+        title="No matching expenses"
+        message="Try another search, clear your filters, or choose All months."
+        actionLabel="Clear filters"
+        onAction={clearFilters}
         showPenney={false}
       />
     );
@@ -194,6 +237,10 @@ const useStyles = makeStyles((colors) =>
       maxWidth: 560,
       alignSelf: 'center',
     },
+    search: { minHeight: 48, paddingHorizontal: spacing.md, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, backgroundColor: colors.surface, color: colors.text, fontSize: 16 },
+    categories: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+    results: { color: colors.text, fontSize: 16, fontWeight: '600' },
+    hint: { color: colors.textMuted, fontSize: 12, lineHeight: 18 },
     headerBlock: { gap: spacing.lg, marginBottom: spacing.lg },
     dayHeader: {
       flexDirection: 'row',

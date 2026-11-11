@@ -246,6 +246,9 @@ const useStyles = makeStyles((colors) =>
     backdrop: { backgroundColor: colors.overlay },
     sheet: {
       maxHeight: '90%',
+      width: '100%',
+      maxWidth: 600,
+      alignSelf: 'center',
       backgroundColor: colors.background,
       borderTopLeftRadius: radius.xl,
       borderTopRightRadius: radius.xl,
