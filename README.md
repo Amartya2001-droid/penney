@@ -8,17 +8,19 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 
 ## Current status
 
-Not live yet — blocked by merging the Pages workflow and separately enabling GitHub Pages
-with **Source: GitHub Actions** in repository settings. GitHub Pages is the decided deployment
-target. Expected URL after deployment: https://amartya2001-droid.github.io/penney/ (not yet verified live).
-Local web builds work. Day 2 re-verification passed all 203 Jest tests and exercised web backup
-export, file and pasted-text restore, replacement confirmation, Undo, duplicate-safe merge,
-and persistence after reload. Native file-picker/share-sheet verification still needs an iOS
-or Android device or simulator. See [Day 2 verification](docs/day-2-verification.md) and [Day 1 verification](docs/day-1-verification.md).
+Live demo: **https://amartya2001-droid.github.io/penney/**. PR #3 is merged and the
+first GitHub Pages deployment was confirmed successful in the [tracking issue](https://github.com/Amartya2001-droid/penney/issues/1#issuecomment-6809500159).
+Pages was enabled separately by the maintainer. This branch adds History search, filtered
+CSV download, and a browser calendar; these additions reach the live demo after merge and
+successful deployment.
+
+Web backup export/restore, replacement confirmation, Undo, duplicate-safe merge, and reload
+persistence have been verified locally. Native file-picker/share-sheet verification still
+needs an iOS or Android device or simulator. See [product verification](docs/web-product-verification.md).
 
 GitHub Actions runs typecheck, lint, tests, and the web build on every push and pull request.
 The Pages workflow also checks the Pages export on PRs, then deploys only from `main`.
-Pages settings are intentionally not enabled by the workflow.
+Pages settings are managed separately from the workflow.
 
 ## Features
 
@@ -268,9 +270,9 @@ so assets and router links use the repository prefix. It copies `index.html` to 
 for direct screen links and reloads (Pages returns HTTP 404 for these fallback responses,
 but the app loads at the original URL), and uploads/deploys the `dist/` artifact. No API key
 or extra deploy secret is needed; deployment uses the workflow's scoped GitHub token.
-After merging, Amartya must enable Pages with **Source: GitHub Actions**, then re-run the
-workflow if the initial deployment failed while Pages was disabled. Confirm the workflow's
-reported URL and update live status after the first successful deployment.
+Pages is already enabled with **Source: GitHub Actions**. Merging to `main` runs the deploy
+workflow. Check its result before claiming new branch features are live. Direct screen URLs
+use the custom 404 fallback described above.
 
 **iOS and Android** with [EAS Build](https://docs.expo.dev/build/introduction/):
 

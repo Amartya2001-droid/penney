@@ -1,8 +1,9 @@
-# Web product improvements — November 11, 2026
+# Web product improvements — Day 3 — November 12, 2026
 
 Amartya authorized product work after the completed Day 2 triage report.
-Branch: `feat/web-product-polish`, based on the Pages workflow branch at `1b977dc`.
-The product PR targets that branch so it can be reviewed independently and merged after PR #3.
+Day 3 branch: `day3/web-product-polish`, created from latest main `bb3d6fd` after fetching.
+The completed local product change was carried onto this fresh branch. PR #3 is now merged;
+the product PR targets main.
 
 ## Working changes
 
@@ -40,6 +41,9 @@ The product PR targets that branch so it can be reviewed independently and merge
 ## Service and release needs
 
 No API key or external service is needed for these features. No credentials were added.
-Pages settings were not changed; a production deployment is still unverified and requires
-PR #3 merge plus separate Pages enablement by Amartya. Native share-sheet/document-picker
-verification remains unverified and needs an iOS/Android device or simulator.
+Pages settings were not changed. The maintainer confirmed the first successful deployment and
+HTTP 200 at https://amartya2001-droid.github.io/penney/ in tracking issue #1. This environment's
+outbound policy rejects github.io (HTTP CONNECT 403), so direct live re-verification is blocked;
+local export checks and hosted PR build results do not establish that branch features are live.
+Native share-sheet/document-picker verification remains unverified and needs an iOS/Android
+device or simulator.
