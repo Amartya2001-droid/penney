@@ -25,6 +25,8 @@ export function Chip({ label, selected, onPress }: ChipProps) {
 const useStyles = makeStyles((colors) =>
   StyleSheet.create({
     chip: {
+      minHeight: 44,
+      justifyContent: 'center',
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
       borderRadius: radius.pill,
