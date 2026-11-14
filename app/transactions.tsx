@@ -134,7 +134,7 @@ export default function TransactionsScreen() {
       ) : null}
       <TextInput
         accessibilityLabel="Search expenses"
-        placeholder="Search notes, categories, dates or amounts"
+        placeholder="Search expenses"
         placeholderTextColor={colors.textMuted}
         value={query} onChangeText={setQuery} style={styles.search}
         autoCorrect={false} returnKeyType="search"
@@ -157,16 +157,16 @@ export default function TransactionsScreen() {
   );
 
   const empty =
-    !hasFilters && scope === 'month' && summary.count === 0 ? (
+    !hasFilters && (scope === 'all' ? transactions.length === 0 : summary.count === 0) ? (
       <EmptyState
-        title={isCurrentMonth ? 'No expenses yet this month' : `Nothing logged in ${formatMonthLabel(monthKey)}`}
+        title={scope === 'all' ? 'No expenses yet' : isCurrentMonth ? 'No expenses yet this month' : `Nothing logged in ${formatMonthLabel(monthKey)}`}
         message={
-          isCurrentMonth
+          scope === 'all' || isCurrentMonth
             ? 'Anything you log shows up here, grouped by day. Tap an expense later to edit it.'
             : 'Use the arrows to look at another month.'
         }
-        actionLabel={isCurrentMonth ? 'Add an expense' : undefined}
-        onAction={isCurrentMonth ? () => setModal({ mode: 'add' }) : undefined}
+        actionLabel={scope === 'all' || isCurrentMonth ? 'Add an expense' : undefined}
+        onAction={scope === 'all' || isCurrentMonth ? () => setModal({ mode: 'add' }) : undefined}
       />
     ) : (
       <EmptyState
