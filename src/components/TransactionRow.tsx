@@ -52,7 +52,6 @@ export function TransactionRow({ transaction, onRemove, onPress, showDate = true
       </Pressable>
       <Pressable
         onPress={onRemove}
-        hitSlop={10}
         accessibilityRole="button"
         accessibilityLabel={`Delete ${label} expense of ${amount}`}
         style={({ pressed }) => [styles.remove, pressed && styles.removePressed]}
@@ -90,7 +89,14 @@ const useStyles = makeStyles((colors) =>
     badgeText: { fontSize: 11, fontWeight: '600', color: colors.text },
     meta: { fontSize: 13, color: colors.textMuted },
     amount: { fontSize: 15, fontWeight: '700', color: colors.text },
-    remove: { padding: spacing.xs, borderRadius: radius.sm },
+    remove: {
+      minWidth: 44,
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xs,
+      borderRadius: radius.sm,
+    },
     removePressed: { backgroundColor: colors.surfaceMuted },
     removeText: { fontSize: 14, color: colors.textMuted },
   }),
