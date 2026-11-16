@@ -147,7 +147,7 @@ export default function TransactionsScreen() {
       <Text style={styles.results} accessibilityLiveRegion="polite">
         {matching.length} {matching.length === 1 ? 'expense' : 'expenses'} · {formatCurrency(matchingTotal)}
       </Text>
-      {hasFilters ? <Button label="Clear filters" variant="ghost" onPress={clearFilters} /> : null}
+      {hasFilters && matching.length > 0 ? <Button label="Clear filters" variant="ghost" onPress={clearFilters} /> : null}
       {Platform.OS === 'web' ? <>
         <Button label="Download results as CSV" variant="secondary" disabled={matching.length === 0} onPress={exportCsv} />
         <Text style={styles.hint}>Exports the expenses shown below in CAD. For a restorable backup, use Settings → Export backup.</Text>
