@@ -171,7 +171,9 @@ export default function TransactionsScreen() {
     ) : (
       <EmptyState
         title="No matching expenses"
-        message="Try another search, clear your filters, or choose All months."
+        message={scope === 'all'
+          ? 'Try another search or clear your filters.'
+          : 'Try another search, clear your filters, or choose All months.'}
         actionLabel="Clear filters"
         onAction={clearFilters}
         showPenney={false}
