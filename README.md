@@ -11,10 +11,10 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 Live demo: **https://amartya2001-droid.github.io/penney/**. PR #3 is merged and the
 first GitHub Pages deployment was confirmed successful in the [tracking issue](https://github.com/Amartya2001-droid/penney/issues/1#issuecomment-6809500159).
 Pages was enabled separately by the maintainer. History search, filtered CSV download, and
-the browser calendar are merged in PR #4 and confirmed live by the maintainer. Day 4–5
-polish is also merged. The [post-merge Pages build and deployment](https://github.com/Amartya2001-droid/penney/actions/runs/43769731066)
-for PR #6 succeeded. This Day 6 branch only removes a duplicate History reset action;
-that polish is pending merge and deployment.
+the browser calendar are merged in PR #4 and confirmed live by the maintainer. Day 4–6
+polish is also merged. The [post-merge Pages build and deployment](https://github.com/Amartya2001-droid/penney/actions/runs/43971277870)
+for PR #7 succeeded. This Day 7 branch only corrects empty-result guidance in All months;
+that wording adjustment is pending merge and deployment.
 
 Web backup export/restore, replacement confirmation, Undo, duplicate-safe merge, and reload
 persistence have been verified locally. Native file-picker/share-sheet verification still
