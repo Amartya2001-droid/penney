@@ -30,7 +30,7 @@ export function UndoToast({ toastKey, message, onUndo, onDismiss, bottomOffset }
         <Text style={styles.message} numberOfLines={2}>
           {message}
         </Text>
-        <Pressable onPress={onUndo} hitSlop={10} accessibilityRole="button" accessibilityLabel="Undo delete">
+        <Pressable onPress={onUndo} style={styles.undoButton} accessibilityRole="button" accessibilityLabel="Undo delete">
           <Text style={styles.undo}>Undo</Text>
         </Pressable>
       </View>
@@ -65,6 +65,7 @@ const useStyles = makeStyles((colors) =>
       elevation: 8,
     },
     message: { flex: 1, color: colors.onInverse, fontSize: 14 },
+    undoButton: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
     undo: { color: colors.inverseAccent, fontSize: 15, fontWeight: '700' },
   }),
 );
