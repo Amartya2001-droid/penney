@@ -11,10 +11,9 @@ Runs on iOS, Android, and web from one Expo + TypeScript codebase. All data stay
 Live demo: **https://amartya2001-droid.github.io/penney/**. PR #3 is merged and the
 first GitHub Pages deployment was confirmed successful in the [tracking issue](https://github.com/Amartya2001-droid/penney/issues/1#issuecomment-6809500159).
 Pages was enabled separately by the maintainer. History search, filtered CSV download, and
-the browser calendar are merged in PR #4 and confirmed live by the maintainer. Day 4–7
-polish is also merged. The [post-merge Pages build and deployment](https://github.com/Amartya2001-droid/penney/actions/runs/44191432014)
-for PR #8 succeeded. This Day 8 branch only enlarges the delete toast's Undo touch target;
-that polish is pending merge and deployment.
+the browser calendar and Day 4–8 polish are merged through PR #9 at `82b78c3`.
+The [production deploy](https://github.com/Amartya2001-droid/penney/actions/runs/44412264910)
+succeeded. The ship-week E2E branch adds test infrastructure only; it does not change the app.
 
 Web backup export/restore, replacement confirmation, Undo, duplicate-safe merge, and reload
 persistence have been verified locally. Native file-picker/share-sheet verification still
@@ -89,6 +88,41 @@ screen, or go to **Settings → Load a demo preset** later.
 | `npm run lint`       | Lint with the Expo ESLint config                |
 | `npm run check`      | Typecheck, lint, and test (run before shipping) |
 | `npm run build:web`  | Build a static web app into `dist/`             |
+
+## Browser E2E checks
+
+The committed Playwright suite runs five scenarios on **desktop and mobile Chromium**
+(10 test executions per target): fresh onboarding, expense CRUD/calendar/Day 8 Undo,
+History/search/filtered CSV, JSON backup/replace/Undo, duplicate-safe merge/reload/direct
+routes, and Undo timeout/empty-state recovery. Tests use separate fresh browser contexts,
+synthetic data, a fixed UTC clock, and real timers. They do not reuse your browser profile,
+seed storage to bypass onboarding, call an AI provider, or send data to a backend.
+Mobile Chromium is viewport/touch coverage, not an iOS/Android device test.
+
+```bash
+npm ci
+npx playwright install chromium       # on Linux CI: add --with-deps
+npm run test:e2e                      # builds and serves candidate under /penney/
+npm run test:e2e:live                 # tests https://amartya2001-droid.github.io/penney/
+```
+
+`E2E_BASE_URL` can select another HTTP(S) deployment, including its path prefix; a trailing
+slash is normalized. Setting it disables the local server. `E2E_CHROMIUM_PATH` optionally
+selects an installed Chromium executable; otherwise Playwright uses its managed browser.
+`E2E_SERVE_DIR` optionally serves an already-built Pages export. The local test server uses
+port 8765, refuses an existing listener, and reproduces Pages' HTTP 404 SPA fallback.
+Tests expect the target's root URL to return HTTP 200; direct screen URLs may return 404
+with the working Pages fallback. An unreachable live target fails explicitly, never skips.
+
+The **Browser E2E** workflow runs on pushes, PRs to main, and manual dispatch. Separate
+`export` and `live` jobs distinguish the candidate from the currently deployed app; a live
+pass does not establish that an unmerged candidate is deployed. Each job publishes JSON
+results, an HTML report, and failure screenshots/traces as artifacts for 14 days. Local
+reports are in `playwright-report/` and `test-results/` (ignored by Git).
+
+Run Jest separately with `npm test -- --ci --runInBand`; it remains the unit/store suite.
+Native share-sheet/document-picker and actual notification delivery remain owner-blocked
+on Amartya's device/simulator verification. Live AI behavior is not covered by this suite.
 
 ## AI commentary
 

@@ -43,3 +43,8 @@ Thumbs.db
 
 # Misc
 *.orig.*
+
+# Browser test artifacts
+/dist-e2e/
+/playwright-report/
+/test-results/
