@@ -13,7 +13,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "build:web": "expo export --platform web",
-    "check": "npm run typecheck && npm run lint && npm test"
+    "check": "npm run typecheck && npm run lint && npm test",
+    "build:e2e": "node scripts/build-e2e.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:live": "node scripts/test-live.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
@@ -38,6 +41,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@types/jest": "^29.5.14",
     "@types/react": "~19.1.10",
     "eslint": "^9.39.5",
