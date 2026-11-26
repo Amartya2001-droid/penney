@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    # Keep browser system dependencies on a stable, Playwright-supported image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
